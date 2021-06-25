@@ -12,9 +12,12 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended:true
 }))
+app.use(express.static(path.join(__dirname,'empleadoimages')))
 
 //routes
 app.use('/api', require('./routes/users'))
+app.use('/api', require('./routes/cargos'))
+app.use('/api', require('./routes/empleados'))
 // app.use('/api', require('./routes/asistencias'))
 
 module.exports=app
