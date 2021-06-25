@@ -11,7 +11,6 @@ const databasename = 'crud'
 //     useUnifiedTopology: true,
 //     useFindAndModify: false
 // })
-//hola
 
 mongoose.connect("mongodb+srv://malfito12:vivabraun123@dbcluster.yhudn.mongodb.net/EMAP?retryWrites=true&w=majority"/*+databasename*/,{
     useNewUrlParser: true,
