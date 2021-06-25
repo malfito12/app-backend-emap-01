@@ -18,6 +18,8 @@ app.use(express.static(path.join(__dirname,'empleadoimages')))
 app.use('/api', require('./routes/users'))
 app.use('/api', require('./routes/cargos'))
 app.use('/api', require('./routes/empleados'))
+app.use('/api', require('./routes/horarios'))
+app.use('/api', require('./routes/horariosAsig'))
 // app.use('/api', require('./routes/asistencias'))
 
 module.exports=app
