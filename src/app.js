@@ -14,5 +14,7 @@ app.use(express.urlencoded({
 }))
 
 //routes
+app.use('/api', require('./routes/users'))
+// app.use('/api', require('./routes/asistencias'))
 
 module.exports=app
