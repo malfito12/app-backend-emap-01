@@ -7,11 +7,19 @@ var EMPLEADOSCHEMA={
         trim:true,
         unique:true
     },
-    filename:String,
-    path:String,
-    originalname:String,
-    mimetype:String,
-    size:Number,
+    //multer ----------------------------------------
+    // filename:String,
+    // path:String,
+    // originalname:String,
+    // mimetype:String,
+    // size:Number,
+
+    //cloudinary-------------------------------------
+    avatar:String,
+    cloudinary_id:String,
+
+    //-------------------------------------------------
+
 
     firstNameEmp:String,
     lastNameEmpP:String,

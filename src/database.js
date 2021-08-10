@@ -12,7 +12,14 @@ const databasename = 'crud'
 //     useFindAndModify: false
 // })
 
-mongoose.connect("mongodb+srv://malfito12:vivabraun123@dbcluster.yhudn.mongodb.net/EMAP?retryWrites=true&w=majority"/*+databasename*/,{
+// mongoose.connect("mongodb+srv://malfito12:vivabraun123@dbcluster.yhudn.mongodb.net/EMAP?retryWrites=true&w=majority",{
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useUnifiedTopology: true,
+//     useFindAndModify:false
+// })
+
+mongoose.connect(process.env.MONGO_URI,{
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
