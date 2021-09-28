@@ -146,7 +146,6 @@ router.get('/cargo/:id', async (req, res) => {
     } catch (error) {
         console.log(error)
     }
-    // console.log(params)
 })
 
 router.put('/cargo/:id', async (req, res) => {
