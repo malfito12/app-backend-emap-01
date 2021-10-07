@@ -32,6 +32,10 @@ const SUELDOSCHEMA={
     buscarFechaInicio:String,
     buscarFechaFinal:String,
     typePlanilla:String,
+//---------------------------------------
+    auxTotalGanado:String,
+    auxTotalDescuento:String,
+    auxLiquidoPagable:String,
 
 }
 

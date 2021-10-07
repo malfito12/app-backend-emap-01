@@ -33,6 +33,7 @@ app.use('/api', require('./routes/antiguedad'))
 //planillas
 app.use('/api', require('./routes/routesPlanillas/planillaSueldo'))
 app.use('/api', require('./routes/routesPlanillas/kardexAsistencia'))
+app.use('/api', require('./routes/routesPlanillas/planillaRefrigerio'))
 
 //horario continuo ----- se tiene que crear en mongo atlas
 app.use("/api", require("./routes/horarioContinuo/contHrs"))

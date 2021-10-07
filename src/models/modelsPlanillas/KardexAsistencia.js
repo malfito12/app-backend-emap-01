@@ -13,6 +13,7 @@ const KARDEXASISTENCIASCHEMA={
     diaTrabajado:String,
     faltas:String,
     observaciones:String,
+    observaciones2:String,
 }
 const KARDEXASISTENCIA=mongoose.model('kardexasistencia',KARDEXASISTENCIASCHEMA)
 module.exports=KARDEXASISTENCIA

@@ -1413,21 +1413,6 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 var hasta = moment(buscarFeriado[0].fechaFeriadoFin, 'YYYY-MM-DD')
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
-                                        array.push({
-                                            id_bio: params,
-                                            dia: diaFeriado,
-                                            fecha: moment(desde).format('YYYY-MM-DD'),
-                                            ingreso1: '00:00:00',
-                                            salida1: '00:00:00',
-                                            ingreso2: '00:00:00',
-                                            salida2: '00:00:00',
-                                            atraso: '00:00:00',
-                                            horasExtra: '00:00:00',
-                                            horasDeTrabajo: "0:00",
-                                            diaTrabajado: '1.0',
-                                            faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
-                                        })
                                         auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaFeriado,
@@ -1441,7 +1426,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -1451,21 +1437,6 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i--
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
-                                        array.push({
-                                            id_bio: params,
-                                            dia: diaFeriado,
-                                            fecha: moment(desde).format('YYYY-MM-DD'),
-                                            ingreso1: '00:00:00',
-                                            salida1: '00:00:00',
-                                            ingreso2: '00:00:00',
-                                            salida2: '00:00:00',
-                                            atraso: '00:00:00',
-                                            horasExtra: '00:00:00',
-                                            horasDeTrabajo: "0:00",
-                                            diaTrabajado: '1.0',
-                                            faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
-                                        })
                                         auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaFeriado,
@@ -1479,7 +1450,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -1642,7 +1614,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         diaTrabajado: '1.0',
                                         horasDeTrabajo: duration.toFixed(2),
                                         faltas: result.toFixed(2),
-                                        observaciones: 'verificar marcación'
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 2) {
@@ -1661,7 +1634,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         horasDeTrabajo: duration.toFixed(2),
                                         diaTrabajado: '1.0',
                                         faltas: result.toFixed(2),
-                                        observaciones: 'verificar marcación'
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 3) {
@@ -1679,7 +1653,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         horasDeTrabajo: duration.toFixed(2),
                                         diaTrabajado: '1.0',
                                         faltas: result.toFixed(2),
-                                        observaciones: 'verificar marcación'
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 4) {
@@ -1697,7 +1672,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         horasDeTrabajo: duration.toFixed(2),
                                         diaTrabajado: '1.0',
                                         faltas: result.toFixed(2),
-                                        observaciones: ''
+                                        observaciones: '',
+                                        observaciones2: "",
                                     })
                                 }
 
@@ -1715,7 +1691,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 var hasta = moment(buscarPermiso[0].fechaPermisoFin, "YYYY-MM-DD")
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
-                                        array.push({
+                                        auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaPermiso,
                                             fecha: moment(desde).format("YYYY-MM-DD"),
@@ -1728,7 +1704,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
@@ -1738,7 +1715,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i--;
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
-                                        array.push({
+                                        auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaPermiso,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
@@ -1751,7 +1728,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
@@ -1767,7 +1745,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 var hasta = moment(buscarFeriado[0].fechaFeriadoFin, 'YYYY-MM-DD')
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
-                                        array.push({
+                                        auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
@@ -1780,7 +1758,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -1790,7 +1769,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i--
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
-                                        array.push({
+                                        auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
@@ -1803,7 +1782,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -1814,7 +1794,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 }
                             }
                             else {
-                                array.push({
+                                auxPrueba3.push({
                                     id_bio: params,
                                     dia: nameDay,
                                     fecha: buscarFechaAux,
@@ -1827,7 +1807,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     horasDeTrabajo: "0:00",
                                     diaTrabajado: '0.0',
                                     faltas: '1.0',
-                                    observaciones: 'Falta'
+                                    observaciones: 'Falta',
+                                    observaciones2: "Falta",
                                 })
                                 suma++;
                             }
@@ -1953,7 +1934,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         diaTrabajado: '1.0',
                                         horasDeTrabajo: duration.toFixed(2),
                                         faltas: result.toFixed(2),
-                                        observaciones: 'verificar marcación'
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 2) {
@@ -1972,7 +1954,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         diaTrabajado: '1.0',
                                         horasDeTrabajo: duration.toFixed(2),
                                         faltas: result.toFixed(2),
-                                        observaciones: ''
+                                        observaciones: '',
+                                        observaciones2: "",
                                     })
 
                                 } else if (numAux == 0) {
@@ -1990,7 +1973,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         diaTrabajado: '0.0',
                                         horasDeTrabajo: "0:00",
                                         faltas: '1.0',
-                                        observaciones: 'Falta'
+                                        observaciones: 'Falta',
+                                        observaciones2: "",
                                     })
                                 }
                                 buscarFechaAux = moment(buscarFechaAux).add(1, 'day').format('YYYY-MM-DD')
@@ -2019,7 +2003,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                                 horasDeTrabajo: "0:00",
                                                 diaTrabajado: '1.0',
                                                 faltas: '0.0',
-                                                observaciones: buscarPermiso[0].namePermiso
+                                                observaciones: buscarPermiso[0].namePermiso,
+                                                observaciones2: "Permiso",
                                             })
                                             desde = moment(desde).add(1, 'day')
                                             diaPermiso = moment(desde).locale('es').format('dddd')
@@ -2042,7 +2027,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                                 horasDeTrabajo: "0:00",
                                                 diaTrabajado: '1.0',
                                                 faltas: '0.0',
-                                                observaciones: buscarPermiso[0].namePermiso
+                                                observaciones: buscarPermiso[0].namePermiso,
+                                                observaciones2: "Permiso",
                                             })
                                             desde = moment(desde).add(1, 'day')
                                             diaPermiso = moment(desde).locale('es').format('dddd')
@@ -2120,7 +2106,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         horasDeTrabajo: "0:00",
                                         diaTrabajado: '0.0',
                                         faltas: '1.0',
-                                        observaciones: 'Falta'
+                                        observaciones: 'Falta',
+                                        observaciones2: "",
                                     })
                                     suma++;
                                 }
@@ -2150,7 +2137,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
@@ -2173,7 +2161,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
@@ -2203,7 +2192,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -2226,7 +2216,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -2249,7 +2240,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     horasDeTrabajo: "0:00",
                                     diaTrabajado: '0.0',
                                     faltas: '1.0',
-                                    observaciones: 'Falta'
+                                    observaciones: 'Falta',
+                                    observaciones2: "",
                                 })
                                 suma++;
                             }
@@ -2612,7 +2604,8 @@ router.put("/kardexAsistencia/:id", async (req, res) => {
             horasDeTrabajo: duration.toFixed(2),
             // faltas: faltasObser,
             faltas: result.toFixed(2),
-            observaciones: obser
+            observaciones: obser,
+            observaciones2: params.observaciones2,
         })
         await KARDEXASISTENCIA.findByIdAndUpdate({ _id: req.params.id }, array[0])
         res.status(200).json({ message: 'marcacion actualizada' })
