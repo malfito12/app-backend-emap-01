@@ -2,6 +2,7 @@ var mongoose=require('../database')
 var HORARIOSCHEMA={
     descripcion:String,
     observaciones:String,
+    cod:String,
     tolerancia:Number,
     ingreso1:String,
     salida1:String,

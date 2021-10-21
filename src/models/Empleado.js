@@ -1,43 +1,81 @@
 var mongoose=require('../database')
 var EMPLEADOSCHEMA={
-    itemEmp:Number,
     id_bio:{
         type:String,
         require:true,
         trim:true,
         unique:true
     },
-    filename:String,
-    path:String,
-    originalname:String,
-    mimetype:String,
-    size:Number,
-
-    firstNameEmp:String,
+    itemEmp:String,
     lastNameEmpP:String,
     lastNameEmpM:String,
+    firstNameEmp:String,
+    nacionalityEmp:String,
     CIEmp:{
         type:String,
         require:true,
         trim:true,
         unique:true
     },
-    emailEmp:String,
+    fechaNacEmp:String,
     sexoEmp:String,
-    numCelEmp:String,
+    cargoEmp:String,
+    haber_basico:String,
+    departamentEmp:String,
+    typeContrato:String,
+    clasificacionLab:String,
+    typeHorario:String,
+    cod_horario:String,
+    typeAntiguedad:String,
+    AFP:String,
+    cod_estH:String,
+    cotizante:String,
+
     dirEmp:String,
-    // photoImgEmp:String,
-    nacionalityEmp:String,
+    numCelEmp:String,
     civilStatusEmp:String,
+    afilSindicato:String,
+    lugarNacimiento:String,
+    emailEmp:String,
     professionEmp:String,
     institutionDegreeEmp:String,
-    ObserEmp:String,
-    fechaNacEmp:String,
-
-    fechaIng:Date,
-    fechaReg:Date,
-    fechaBaja:Date,
     estadoEmp:String,
+    ObserEmp:String,
+
+    // fechaIni:String,
+    // fechaFin:String,
+    fechaReg:Date,
+    fechaBaja:String,
+
+    //asignacion de horario
+    tolerancia:Number,
+    ingreso1:String,
+    salida1:String,
+    ingreso2:String,
+    salida2:String,
+    fechaini:String,
+    fechafin:String,
+    
+    //cloudinary-------------------------------------
+    avatar:String,
+    cloudinary_id:String,
+
+
+
+
+    //multer ----------------------------------------
+    // filename:String,
+    // path:String,
+    // originalname:String,
+    // mimetype:String,
+    // size:Number,
+
+
+    //-------------------------------------------------
+
+
+    // photoImgEmp:String,
+
 
     // emp_id_doc:Number,
 
