@@ -6,6 +6,7 @@ const ASIS = require('../../models/Asistencia')
 const PERMISO = require('../../models/Permiso')
 const FERIADO = require('../../models/Feriado')
 const KARDEXASISTENCIA = require('../../models/modelsPlanillas/KardexAsistencia')
+const VACACION = require('../../models/Vacaciones')
 
 
 router.get('/sueldo/:id', async (req, res) => {
@@ -1405,6 +1406,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                             //SI EXISTE MARCACION
                             const num = getMarcacion.length
                             const buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
+                            var buscarVacacion = await VACACION.find({ '$and': [{ id_bio: params }, { fechaVacacionIni: buscarFechaAux }] })
                             if (buscarFeriado.length > 0) {
                                 //----FERIADOS------------------
                                 var suma = 0;
@@ -1461,7 +1463,62 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i--;
                                 }
                                 buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
-                            } else {
+                            } 
+                            else if(buscarVacacion.length>0){
+                                var diaVacacion = nameDay
+                                var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
+                                if (hasta <= buscarFechaFin) {
+                                    while (desde.isSameOrBefore(hasta)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format("YYYY-MM-DD"),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++
+                                    }
+                                    i = i + suma;
+                                    i--;
+                                } else if (hasta >= buscarFechaFinAux) {
+                                    while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format('YYYY-MM-DD'),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++;
+                                    }
+                                    i = i + suma;
+                                    i--
+                                }
+                            }
+                            else {
                                 //---------------PRUEBAS-----------------
                                 for (var n = 0; n < num; n++) {
                                     auxPrueba.push(getMarcacion[n].hora)
@@ -1557,7 +1614,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         var durationTotal = duration1 + duration2
                                         var result = 0;
                                         if (durationTotal > 7) {
-                                            result = 1.0
+                                            result = 0
                                         } else { result = 0.5 }
                                         return { durationTotal, result }
 
@@ -1658,7 +1715,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     })
                                 }
                                 else if (numAux == 4) {
-                                    const { duration, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1], auxPrueba2[3], auxPrueba2[4])
+                                    const { durationTotal, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1], auxPrueba2[2], auxPrueba2[3])
                                     auxPrueba3.push({
                                         id_bio: params,
                                         fecha: buscarFechaAux,
@@ -1669,7 +1726,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         salida2: auxPrueba2[3],
                                         atraso: atraso(auxPrueba2[0], auxPrueba2[2]),
                                         horasExtra: horasExtra(auxPrueba2[1], auxPrueba2[3]),
-                                        horasDeTrabajo: duration.toFixed(2),
+                                        horasDeTrabajo: durationTotal.toFixed(2),
                                         diaTrabajado: '1.0',
                                         faltas: result.toFixed(2),
                                         observaciones: '',
@@ -1685,6 +1742,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                             var suma = 0;
                             var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
                             var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
+                            var buscarVacacion= await VACACION.find({"$and":[{id_bio:params},{fechaVacacionIni:buscarFechaAux}] })
                             if (buscarPermiso != 0) {
                                 var diaPermiso = nameDay
                                 var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
@@ -1733,6 +1791,60 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
+                                        suma++;
+                                    }
+                                    i = i + suma;
+                                    i--
+                                }
+                            }
+                            else if(buscarVacacion.length>0){
+                                var diaVacacion = nameDay
+                                var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
+                                if (hasta <= buscarFechaFin) {
+                                    while (desde.isSameOrBefore(hasta)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format("YYYY-MM-DD"),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++
+                                    }
+                                    i = i + suma;
+                                    i--;
+                                } else if (hasta >= buscarFechaFinAux) {
+                                    while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format('YYYY-MM-DD'),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
                                         suma++;
                                     }
                                     i = i + suma;
@@ -1982,6 +2094,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 //ENTRA A GET_MARCACIONES Y GET_MARCACIONES2 PERO NO PUSHEA NUNGUNA MARCACION
                                 var suma = 0;
                                 var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
+                                var buscarVacacion = await VACACION.find({ '$and': [{ id_bio: params }, { fechaVacacionIni: buscarFechaAux }] })
                                 //---NOCTURNOS NO TIENEN FERIADO---------
                                 // var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
                                 if (buscarPermiso.length > 0) {
@@ -2032,6 +2145,60 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                             })
                                             desde = moment(desde).add(1, 'day')
                                             diaPermiso = moment(desde).locale('es').format('dddd')
+                                            suma++;
+                                        }
+                                        i = i + suma;
+                                        i--;
+                                    }
+                                }
+                                else if (buscarPermiso.length > 0) {
+                                    var diaVacacion = nameDay
+                                    var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                    var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
+                                    if (hasta <= buscarFechaFin) {
+                                        while (desde.isSameOrBefore(hasta)) {
+                                            auxPrueba3.push({
+                                                id_bio: params,
+                                                dia: diaVacacion,
+                                                fecha: moment(desde).format("YYYY-MM-DD"),
+                                                ingreso1: '00:00:00',
+                                                salida1: '00:00:00',
+                                                ingreso2: '00:00:00',
+                                                salida2: '00:00:00',
+                                                atraso: '00:00:00',
+                                                horasExtra: '00:00:00',
+                                                horasDeTrabajo: "0:00",
+                                                diaTrabajado: '1.0',
+                                                faltas: '0.0',
+                                                observaciones: buscarVacacion[0].nameVacaciones,
+                                                observaciones2: "Permiso",
+                                            })
+                                            desde = moment(desde).add(1, 'day')
+                                            diaVacacion = moment(desde).locale('es').format('dddd')
+                                            suma++
+                                        }
+                                        i = i + suma
+                                        i--
+                                    } else if (hasta >= buscarFechaFinAux) {
+                                        while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                            auxPrueba3.push({
+                                                id_bio: params,
+                                                dia: diaVacacion,
+                                                fecha: moment(desde).format('YYYY-MM-DD'),
+                                                ingreso1: '00:00:00',
+                                                salida1: '00:00:00',
+                                                ingreso2: '00:00:00',
+                                                salida2: '00:00:00',
+                                                atraso: '00:00:00',
+                                                horasExtra: '00:00:00',
+                                                horasDeTrabajo: "0:00",
+                                                diaTrabajado: '1.0',
+                                                faltas: '0.0',
+                                                observaciones: buscarVacacion[0].nameVacaciones,
+                                                observaciones2: "Permiso",
+                                            })
+                                            desde = moment(desde).add(1, 'day')
+                                            diaVacacion = moment(desde).locale('es').format('dddd')
                                             suma++;
                                         }
                                         i = i + suma;
@@ -2118,6 +2285,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                             var suma = 0;
                             var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
                             var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
+                            var buscarVacacion= await VACACION.find({"$and":[{id_bio:params},{fechaVacacionIni:buscarFechaAux}] })
                             if (buscarPermiso.length > 0) {
                                 var diaPermiso = nameDay
                                 var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
@@ -2170,6 +2338,60 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     }
                                     i = i + suma;
                                     i--;
+                                }
+                            }
+                            else if(buscarVacacion.length>0){
+                                var diaVacacion = nameDay
+                                var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
+                                if (hasta <= buscarFechaFin) {
+                                    while (desde.isSameOrBefore(hasta)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format("YYYY-MM-DD"),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++
+                                    }
+                                    i = i + suma;
+                                    i--;
+                                } else if (hasta >= buscarFechaFinAux) {
+                                    while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format('YYYY-MM-DD'),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++;
+                                    }
+                                    i = i + suma;
+                                    i--
                                 }
                             }
                             else if (buscarFeriado.length > 0) {

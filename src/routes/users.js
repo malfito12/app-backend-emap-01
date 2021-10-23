@@ -10,6 +10,7 @@ const keycypher = "password123456"
 
 router.post('/user', async (req, res, next) => {
     var params = req.body
+    // console.log(params)
     var name = await USER.find({ username: params.username })
     var email = await USER.find({ email: params.email })
     if (name.length >= 1 || email.length >= 1) {
@@ -33,6 +34,14 @@ router.post('/user', async (req, res, next) => {
         res.status(200).json(params)
     })
 })
+
+
+router.get("/consultaUser", async (req, res) => {
+    const cantUser = await USER.find({}).countDocuments()
+    // console.log(cantUser)
+    res.status(200).json(cantUser)
+})
+
 
 router.get('/user', verifyTokenAdmin, verifyTokenUser, (req, res, next) => {
     var params = req.query
@@ -107,7 +116,7 @@ router.put('/user/:id', async (req, res) => {
         sexo: params.sexo,
         rols: params.rols
     })
-    res.status(200).json({message:'usuario actualizado'})
+    res.status(200).json({ message: 'usuario actualizado' })
 })
 // router.patch('/user', (req, res, next) => {
 //     var params = req.query
@@ -186,7 +195,7 @@ router.post('/login', (req, res, next) => {
         })
 })
 
-function verifyTokenAdmin(req, res, next) {
+async function verifyTokenAdmin(req, res, next) {
     const token = req.headers['authorization']
     if (!token) {
         return res.status(401).json({
@@ -222,7 +231,7 @@ function verifyTokenAdmin(req, res, next) {
         })
     })
 }
-function verifyTokenUser(req, res, next) {
+async function verifyTokenUser(req, res, next) {
     const token = req.headers['authorization']
     if (!token) {
         return res.status(401).json({

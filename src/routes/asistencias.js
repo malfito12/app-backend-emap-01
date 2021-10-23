@@ -12,29 +12,30 @@ const KARDEX = require('../models/KardexEmp');
 
 router.post('/asistencia', async (req, res) => {
     const params = req.body
-    const asistencia = new ASIS({
-        id_bio: params.id_bio,
-        fecha: params.fecha,
-        hora: params.hora
-    })
-    await asistencia.save().then(() => {
-        res.status(200).json({ message: asistencia })
-    })
-    //REGISTRAR HORARIO DE INVIERNO
-    // if(horarioInvierno){
-    //     const horarioInv= new HORARIOINV({
-    //         id_bio:params.id_bio,
-    //         fecha:params.fecha,
-    //         hora:params.hora
-    //     })
-    // }else{
-    //     const horarioInv= new HORARIOINV({
-    //         id_bio:params.id_bio,
-    //         fecha:params.fecha,
-    //         hora:params.hora
-    //     })
-    // }
+    try {
+        const existe = await ASIS.find({ "$and": [{ id_bio: params.id_bio }, { fecha: params.fecha }, { hora: params.hora }] })
+        if (existe.length > 0) {
+            await ASIS.deleteMany({ "$and": [{ id_bio: params.id_bio }, { fecha: params.fecha }, { hora: params.hora }] })
+            const asistencia = new ASIS(params)
+            asistencia.save()
+        } else {
+            const asistencia = new ASIS(params)
+            asistencia.save()
+        }
+        res.status(200).json({message:"marcacion registrada"})
+    } catch (error) {
+        console.log(error)
+    }
+    // const asistencia = new ASIS({
+    //     id_bio: params.id_bio,
+    //     fecha: params.fecha,
+    //     hora: params.hora
+    // })
+    // await asistencia.save().then(() => {
+    //     res.status(200).json({ message: asistencia })
+    // })
 })
+
 router.get('/asistencia', async (req, res) => {
     var params = req.query
     var SKIP = 0;
@@ -414,11 +415,11 @@ router.get('/search/:id', async (req, res) => {
         var searchfin = moment(params2.fechafin)
         var searchcont = moment(params2.fechaini)
         var contday = 0;
-        const tolerancia= empleado[0].tolerancia
-        var hora1= moment(`1990-01-01 ${empleado[0].ingreso1}`).add(tolerancia,'m').format("HH:mm:ss")
-        var hora2=empleado[0].salida1
-        var hora3= moment(`1990-01-01 ${empleado[0].ingreso2}`).add(tolerancia,'m').format("HH:mm:ss")
-        var hora4=empleado[0].salida2
+        const tolerancia = empleado[0].tolerancia
+        var hora1 = moment(`1990-01-01 ${empleado[0].ingreso1}`).add(tolerancia, 'm').format("HH:mm:ss")
+        var hora2 = empleado[0].salida1
+        var hora3 = moment(`1990-01-01 ${empleado[0].ingreso2}`).add(tolerancia, 'm').format("HH:mm:ss")
+        var hora4 = empleado[0].salida2
         while (searchcont <= searchfin) {
             searchcont = moment(searchcont).add(1, 'day')
             contday++;
@@ -460,7 +461,7 @@ router.get('/search/:id', async (req, res) => {
                         array.push({
                             id_bio: params,
                             dia: weekDay,
-                            fecha:fechaini,
+                            fecha: fechaini,
                             ingreso1: '00:00',
                             salida1: '00:00',
                             ingreso2: '00:00',
@@ -472,7 +473,7 @@ router.get('/search/:id', async (req, res) => {
                         var weekDayPermiso = weekDay
                         var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
                         var hasta = moment(buscarPermiso[0].fechaPermisoFin, "YYYY-MM-DD")
-                        if(hasta<=searchfin){
+                        if (hasta <= searchfin) {
                             while (desde.isSameOrBefore(hasta)) {
                                 array.push({
                                     id_bio: params,
@@ -484,13 +485,13 @@ router.get('/search/:id', async (req, res) => {
                                     salida2: '00:00',
                                     observaciones: buscarPermiso[0].namePermiso
                                 })
-                                desde=moment(desde).add(1,'day')
-                                weekDayPermiso=moment(desde).locale('es').format('dddd')
+                                desde = moment(desde).add(1, 'day')
+                                weekDayPermiso = moment(desde).locale('es').format('dddd')
                                 suma++
                             }
-                            i=i+suma;
+                            i = i + suma;
                             i--;
-                        }else if(hasta >=searchfin){
+                        } else if (hasta >= searchfin) {
                             while (desde.isSameOrBefore(searchfin)) {
                                 array.push({
                                     id_bio: params,
@@ -502,305 +503,305 @@ router.get('/search/:id', async (req, res) => {
                                     salida2: '00:00',
                                     observaciones: buscarPermiso[0].namePermiso
                                 })
-                                desde=moment(desde).add(1,'day')
-                                weekDayPermiso=moment(desde).locale('es').format('dddd')
+                                desde = moment(desde).add(1, 'day')
+                                weekDayPermiso = moment(desde).locale('es').format('dddd')
                                 suma++
                             }
-                            i=i+suma;
+                            i = i + suma;
                             i--;
                         }
-                    } else if(buscarFeriado!=0){
+                    } else if (buscarFeriado != 0) {
                         array.push({
-                            id_bio:params,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:'00:00',
-                            ingreso2:'00:00',
-                            salida2:'00:00',
-                            fecha:fechaini,
-                            observaciones:buscarFeriado[0].nameFeriado
+                            id_bio: params,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: '00:00',
+                            ingreso2: '00:00',
+                            salida2: '00:00',
+                            fecha: fechaini,
+                            observaciones: buscarFeriado[0].nameFeriado
                         })
                         suma++;
-                    } else  {
+                    } else {
                         array.push({
-                            id_bio:params,
-                            dia:weekDay,
-                            fecha:fechaini,
-                            ingreso1:'00:00',
-                            salida1:'00:00',
-                            ingreso:'00:00',
-                            salida2:'00:00'
+                            id_bio: params,
+                            dia: weekDay,
+                            fecha: fechaini,
+                            ingreso1: '00:00',
+                            salida1: '00:00',
+                            ingreso: '00:00',
+                            salida2: '00:00'
                         })
                         // console.log('si')
                         suma++;
                     }
-                    fechaini=moment(fechaini).add(suma,'day')
+                    fechaini = moment(fechaini).add(suma, 'day')
                     // console.log(fechaini)
                     // fechaini=moment(fechaini, "YYYY-MM-DD").format("YYYY-MM-DD")
-                }else if(asisSearch !=0){
-                    var buscar= await ASIS.find({"$and":[{id_bio:params},{fecha:fechaini}]})
+                } else if (asisSearch != 0) {
+                    var buscar = await ASIS.find({ "$and": [{ id_bio: params }, { fecha: fechaini }] })
                     // console.log(buscar)
-                    for (var j=0;j<buscar.length;j++){
-                        if(buscar[j].hora>a && buscar[j].hora<b){
-                            contIngre1='1';
-                            aux.push({hora: buscar[j].hora})
-                        } else if(buscar[j].hora>b&&buscar[j].hora<c){
-                            contSalid1='1';
-                            aux.push({hora:buscar[j].hora})
-                        } else if(buscar[j].hora>c&&buscar[j].hora<d){
-                            contIngre2='1';
-                            aux.push({hora:buscar[j].hora})
-                        }else if(buscar[j].hora>d&&buscar[j].hora<e){
-                            contSalid2='1';
-                            aux.push({hora:buscar[j].hora})
-                        } 
+                    for (var j = 0; j < buscar.length; j++) {
+                        if (buscar[j].hora > a && buscar[j].hora < b) {
+                            contIngre1 = '1';
+                            aux.push({ hora: buscar[j].hora })
+                        } else if (buscar[j].hora > b && buscar[j].hora < c) {
+                            contSalid1 = '1';
+                            aux.push({ hora: buscar[j].hora })
+                        } else if (buscar[j].hora > c && buscar[j].hora < d) {
+                            contIngre2 = '1';
+                            aux.push({ hora: buscar[j].hora })
+                        } else if (buscar[j].hora > d && buscar[j].hora < e) {
+                            contSalid2 = '1';
+                            aux.push({ hora: buscar[j].hora })
+                        }
                         // else aux.push({hora:buscar[j].hora})
                     }
                     // console.log(aux)
-                    var result= contIngre1.concat(contSalid1,contIngre2,contSalid2)
+                    var result = contIngre1.concat(contSalid1, contIngre2, contSalid2)
                     // console.log(result)
                     const una = new Date('1990-01-01 00:00:00')
-                    const temprano1=()=>{
-                        if(aux[0].hora> hora1){
-                            var aux2=aux[0]
-                            var aux3=aux2.hora
-                            var data= new Date(`1990-01-01 ${aux3}`)
-                            hora1=hora1.split(":")
-                            hora1=parseInt(hora1[0])
-                            data=moment(data).subtract(hora1,'h').subtract(tolerancia,'m').format('HH:mm:ss')
+                    const temprano1 = () => {
+                        if (aux[0].hora > hora1) {
+                            var aux2 = aux[0]
+                            var aux3 = aux2.hora
+                            var data = new Date(`1990-01-01 ${aux3}`)
+                            hora1 = hora1.split(":")
+                            hora1 = parseInt(hora1[0])
+                            data = moment(data).subtract(hora1, 'h').subtract(tolerancia, 'm').format('HH:mm:ss')
                             return data
-                        } else if(aux[0].hora>hora3){
-                            var aux2=aux[0]
-                            var aux3=aux3.hora
-                            var data= new Date(`1990-01-01 ${aux3}`)
-                            hora3=hora3.split(":")
-                            hora3=parseInt(hora3[0])
-                            data=moment(data).subtract(hora3,'h').subtract(tolerancia,'m').format('HH:mm:ss')
+                        } else if (aux[0].hora > hora3) {
+                            var aux2 = aux[0]
+                            var aux3 = aux3.hora
+                            var data = new Date(`1990-01-01 ${aux3}`)
+                            hora3 = hora3.split(":")
+                            hora3 = parseInt(hora3[0])
+                            data = moment(data).subtract(hora3, 'h').subtract(tolerancia, 'm').format('HH:mm:ss')
                             return data
                         }
                         else return moment(una).format("HH:mm:ss")
                     }
-                    const temprano2=(e)=>{
+                    const temprano2 = (e) => {
                         // console.log(e)
                         // console.log(hora3)
-                        if(e>hora3){
-                            var data= new Date(`1990-01-01 ${e}`)
-                            hora3=hora3.split(":")
-                            data=moment(data).subtract(parseInt(hora3[0]),'h').subtract(parseInt(hora3[1]),'m').format("HH:mm:ss")
+                        if (e > hora3) {
+                            var data = new Date(`1990-01-01 ${e}`)
+                            hora3 = hora3.split(":")
+                            data = moment(data).subtract(parseInt(hora3[0]), 'h').subtract(parseInt(hora3[1]), 'm').format("HH:mm:ss")
                             // console.log(data)
                             return data
                         } else return moment(una).format("HH:mm:ss")
                     }
-                    if(result==='0001'){
+                    if (result === '0001') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:'00:00',
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: '00:00',
+                            ingreso2: '00:00',
                             salida2: aux[0].hora,
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='0010'){
+                    } else if (result === '0010') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:'00:00',
-                            ingreso2:aux[0].hora,
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: '00:00',
+                            ingreso2: aux[0].hora,
                             atraso2: temprano2(aux[0].hora),
                             salida2: '00:00',
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='0011'){
+                    } else if (result === '0011') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:'00:00',
-                            ingreso2:aux[0].hora,
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: '00:00',
+                            ingreso2: aux[0].hora,
                             atraso2: temprano2(aux[0].hora),
                             salida2: aux[1].hora,
                         })
-                    }else if(result==='0100'){
+                    } else if (result === '0100') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:aux[0].hora,
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: aux[0].hora,
+                            ingreso2: '00:00',
                             salida2: '00:00',
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='0101'){
+                    } else if (result === '0101') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:aux[0].hora,
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: aux[0].hora,
+                            ingreso2: '00:00',
                             salida2: aux[1].hora,
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='0110'){
+                    } else if (result === '0110') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:aux[0].hora,
-                            ingreso2:aux[1].hora,
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: aux[0].hora,
+                            ingreso2: aux[1].hora,
                             atraso2: temprano2(aux[1].hora),
                             salida2: aux[1].hora,
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='0111'){
+                    } else if (result === '0111') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:aux[0].hora,
-                            ingreso2:aux[1].hora,
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: aux[0].hora,
+                            ingreso2: aux[1].hora,
                             atraso2: temprano2(aux[1].hora),
                             salida2: aux[2].hora,
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1000'){
+                    } else if (result === '1000') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:'00:00',
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: '00:00',
+                            ingreso2: '00:00',
                             salida2: '00:00',
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1001'){
+                    } else if (result === '1001') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:'00:00',
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: '00:00',
+                            ingreso2: '00:00',
                             salida2: aux[1].hora,
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1010'){
+                    } else if (result === '1010') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:'00:00',
-                            ingreso2:aux[1].hora,
-                            atraso2:temprano2(aux[1].hora),
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: '00:00',
+                            ingreso2: aux[1].hora,
+                            atraso2: temprano2(aux[1].hora),
                             salida2: '00:00',
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1011'){
+                    } else if (result === '1011') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:'00:00',
-                            ingreso2:aux[1].hora,
-                            atraso2:temprano2(aux[1].hora),
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: '00:00',
+                            ingreso2: aux[1].hora,
+                            atraso2: temprano2(aux[1].hora),
                             salida2: aux[2].hora,
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1100'){
+                    } else if (result === '1100') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:aux[1].hora,
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: aux[1].hora,
+                            ingreso2: '00:00',
                             salida2: '00:00',
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1101'){
+                    } else if (result === '1101') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:aux[1].hora,
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: aux[1].hora,
+                            ingreso2: '00:00',
                             salida2: aux[2].hora,
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1110'){
+                    } else if (result === '1110') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:aux[1].hora,
-                            ingreso2:aux[2].hora,
-                            atraso2:temprano2(aux[2].hora),
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: aux[1].hora,
+                            ingreso2: aux[2].hora,
+                            atraso2: temprano2(aux[2].hora),
                             salida2: '00:00',
-                            observaciones:'verificar marcación'
+                            observaciones: 'verificar marcación'
                         })
-                    }else if(result==='1111'){
+                    } else if (result === '1111') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:aux[0].hora,
-                            atraso1:temprano1(),
-                            salida1:aux[1].hora,
-                            ingreso2:aux[2].hora,
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: aux[0].hora,
+                            atraso1: temprano1(),
+                            salida1: aux[1].hora,
+                            ingreso2: aux[2].hora,
                             atraso2: temprano2(aux[2].hora),
                             salida2: aux[3].hora,
                         })
-                    }else if(result==='0000'){
+                    } else if (result === '0000') {
                         array.push({
-                            id_bio:params,
-                            fecha:fechaini,
-                            dia:weekDay,
-                            ingreso1:'00:00',
-                            salida1:'00:00',
-                            ingreso2:'00:00',
+                            id_bio: params,
+                            fecha: fechaini,
+                            dia: weekDay,
+                            ingreso1: '00:00',
+                            salida1: '00:00',
+                            ingreso2: '00:00',
                             salida2: '00:00',
                             observaciones: 'fuera de horario'
                         })
                     }
-                    fechaini=moment(fechaini).add(1,'day')
+                    fechaini = moment(fechaini).add(1, 'day')
                     // fechaini=moment(fechaini,"YYYY-MM-DD").format('YYYY-MM-DD')
                 }
-                
-            }else fechaini= moment(fechaini).add(1,'day')
+
+            } else fechaini = moment(fechaini).add(1, 'day')
         }
-        const contArray= array.length
-        for(var i=0;i<contArray;i++){
-            const existe= await KARDEX.find({"$and":[{id_bio: array[i].id_bio},{fecha:array[i].fecha}]}).countDocuments()
-            if( existe ==0){
-                const kardexEmp= new KARDEX(array[i])
+        const contArray = array.length
+        for (var i = 0; i < contArray; i++) {
+            const existe = await KARDEX.find({ "$and": [{ id_bio: array[i].id_bio }, { fecha: array[i].fecha }] }).countDocuments()
+            if (existe == 0) {
+                const kardexEmp = new KARDEX(array[i])
                 kardexEmp.save()
                 // console.log('guardado')
                 // kardexEmp.save().then(()=>{
                 //     res.status(200).json({message:'dato guardado'})
                 // })
-            }else{
-                await KARDEX.deleteOne({fecha:array[i].fecha})
-                const kardexEmp= new KARDEX(array[i])
+            } else {
+                await KARDEX.deleteOne({ fecha: array[i].fecha })
+                const kardexEmp = new KARDEX(array[i])
                 kardexEmp.save()
                 // console.log('eliminado y guardado')
                 // kardexEmp.save().then(()=>{
@@ -810,8 +811,8 @@ router.get('/search/:id', async (req, res) => {
         }
         res.json(array)
         // res.json(empleado)
-    }else{
-        res.status(300).json({message:'empleado no encontrado'})
+    } else {
+        res.status(300).json({ message: 'empleado no encontrado' })
     }
 })
 

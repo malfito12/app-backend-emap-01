@@ -139,8 +139,9 @@ router.get('/cargo', async (req, res) => {
 
 router.get('/cargo/:id', async (req, res) => {
     const params = req.params.id
+    // console.log(params)
     try {
-        const cargos = await CARGO.find({ _id: params })
+        const cargos = await CARGO.find({ nameDepartament: params })
         res.status(200).json(cargos)
         // console.log(cargos)
     } catch (error) {

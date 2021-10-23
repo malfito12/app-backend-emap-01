@@ -23,6 +23,7 @@ app.use('/api', require('./routes/empleados'))
 app.use('/api', require('./routes/horarios'))
 app.use('/api', require('./routes/horariosAsig'))
 app.use('/api', require('./routes/permisos'))
+app.use('/api', require('./routes/vacaciones'))
 app.use('/api', require('./routes/feriados'))
 app.use('/api', require('./routes/asistencias'))
 
