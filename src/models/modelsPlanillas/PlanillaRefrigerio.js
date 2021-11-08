@@ -4,6 +4,7 @@ const REFRIGERIOSHCEMA = {
     CIEmp: String,
     fullName: String,
     cargoEmp: String,
+    departamentEmp:String,
     diasTrabajado: String,
     pagoPorDia: String,
     totalServicio: String,

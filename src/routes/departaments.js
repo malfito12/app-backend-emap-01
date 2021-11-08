@@ -2,6 +2,7 @@ const express = require('express')
 const CARGO = require('../models/Cargo')
 const router = express.Router()
 const DEPARTAMENT = require('../models/Departament')
+const EMPLEADO = require('../models/Empleado')
 
 router.post('/departament', async (req, res) => {
     const params = req.body
@@ -31,12 +32,16 @@ router.get('/departament', async (req, res) => {
 })
 
 router.put('/departament/:id', async (req, res) => {
-    const params = req.params.id
+    const params = req.body
     try {
-        await DEPARTAMENT.findByIdAndUpdate({ _id: params }, {
-            cod_dep: params.cod_dep,
-            nameDepartament: params.nameDepartament
-        })
+        const departament=await DEPARTAMENT.findById({_id:req.params.id})
+        await DEPARTAMENT.findByIdAndUpdate({_id:req.params.id},params)
+        await EMPLEADO.updateMany({departamentEmp:departament.nameDepartament},{$set:{departamentEmp:params.nameDepartament}})
+        await CARGO.updateMany({nameDepartament:departament.nameDepartament},{$set:{nameDepartament:params.nameDepartament}})
+        // await DEPARTAMENT.findByIdAndUpdate({ _id: params }, {
+        //     cod_dep: params.cod_dep,
+        //     nameDepartament: params.nameDepartament
+        // })
         res.status(200).json({ message: 'Departamento actualizado' })
     } catch (error) {
         console.log(error)

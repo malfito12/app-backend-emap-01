@@ -6,6 +6,7 @@ const SUELDOSCHEMA={
     nacionality:String,
     sexoEmp:String,
     cargoEmp:String,
+    departamentEmp:String,
     fechaIng:String,
     haber_basico:String,
     diasTrabajados:String,

@@ -155,8 +155,10 @@ const checkkeys = key => {
     return false
 }
 
-router.post('/login', (req, res, next) => {
+router.post('/login',async (req, res, next) => {
     var params = req.body;
+    const usuario=await USER.find({email:params.email})
+    // console.log(usuario[0].rols[0])
     var passwordcypher = crypto.createHash('md5')
         .update(params.password)
         .digest('hex')
@@ -186,7 +188,9 @@ router.post('/login', (req, res, next) => {
                             return
                         }
                         res.status(200).json({
-                            "token": token
+                            "token": token,
+                            "rols": usuario[0].rols[0],
+                            "username": usuario[0].username,
                         })
                         return;
                     }

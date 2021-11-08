@@ -21,7 +21,12 @@ var CARGOSCHEMA={
         trim:true,
         unique:true
     },
-    nameCargo:String,
+    nameCargo:{
+        type:String,
+        require:true,
+        trim:true,
+        unique:true
+    },
     cod_dep:String,
     nameDepartament:String,
     haber_basico:String,

@@ -37,4 +37,25 @@ router.get('/vacacion',async(req,res)=>{
     res.status(200).json(vacaciones)
 })
 
+router.put('/vacacion/:id',async(req,res)=>{
+    const params=req.body
+    // console.log(req.params.id)
+    try {
+        await VACACION.findByIdAndUpdate({_id:req.params.id}, params)
+        res.status(200).json({message:'vacacion editada'})
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+router.delete('/vacacion/:id',async(req,res)=>{
+    const params=req.params.id
+    try {
+        await VACACION.findByIdAndDelete({_id:params})
+        res.status(200).json({message:'vacacion eliminada'})
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 module.exports = router

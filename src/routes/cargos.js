@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const CARGO = require('../models/Cargo')
+const EMPLEADO = require('../models/Empleado')
 const EMPLE = require('../models/Empleado')
 
 // router.post('/cargo',async(req,res)=>{
@@ -149,16 +150,21 @@ router.get('/cargo/:id', async (req, res) => {
     }
 })
 
+
 router.put('/cargo/:id', async (req, res) => {
-    const params = req.params.id
+    const params = req.body
+
     try {
-        await CARGO.findByIdAndUpdate({ _id: params }, {
-            cod_cargo: params.cod_cargo,
-            nameCargo: params.nameCargo,
-            cod_dep: params.cod_dep,
-            nameDepartament: params.nameDepartament,
-            haber_basico:params.haber_basico
-        })
+        const cargo=await CARGO.findById({_id:req.params.id})
+        await CARGO.findByIdAndUpdate({_id:req.params.id},params)
+        await EMPLEADO.updateMany({departamentEmp:cargo.nameDepartament,cargoEmp:cargo.nameCargo},{$set:{departamentEmp:params.nameDepartament,cargoEmp:params.nameCargo}})
+        // await CARGO.findByIdAndUpdate({ _id: req.params.id }, {
+        //     cod_cargo: params.cod_cargo,
+        //     nameCargo: params.nameCargo,
+        //     cod_dep: params.cod_dep,
+        //     nameDepartament: params.nameDepartament,
+        //     haber_basico:params.haber_basico
+        // })
         res.status(200).json({ message: 'Cargo Actualizado' })
     } catch (error) {
         console.log(error)
@@ -177,6 +183,15 @@ router.delete('/cargo/:id', async (req, res) => {
         } else {
             res.status(300).json({ message: 'error aun existe personal registrado con ese cargo' })
         }
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+router.get('/empleadoCargo',async(req,res)=>{
+    try {
+        const empleadoCargo=await EMPLEADO.find({})
+        res.status(200).json(empleadoCargo)
     } catch (error) {
         console.log(error)
     }
