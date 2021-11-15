@@ -32,6 +32,15 @@ router.get('/feriado', async (req, res) => {
     res.status(200).json(feriado)
 })
 
+router.put('/feriado/:id',async(req,res)=>{
+    const params=req.body
+    try {
+        await FERIADO.findByIdAndUpdate({_id:req.params.id},params)
+        res.status(200).json({message:'feriado actualizado'})
+    } catch (error) {
+        console.log(error)
+    }
+})
 router.delete('/feriado/:id', async (req, res) => {
     const params = req.params.id
     try {

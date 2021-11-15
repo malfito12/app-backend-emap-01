@@ -45,6 +45,7 @@ router.get("/consultaUser", async (req, res) => {
 
 router.get('/user', verifyTokenAdmin, verifyTokenUser, (req, res, next) => {
     var params = req.query
+    // console.log(params.email)
     var SKIP = 0;
     var LIMIT = 100;
     var order = 1;

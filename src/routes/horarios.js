@@ -66,27 +66,21 @@ router.get('/horario', async (req, res) => {
 
 router.put('/horario/:id', async (req, res) => {
     const params = req.body
-    // var aux=params.observaciones
-    // aux=aux.split("/")
-    // const codMod=aux[0]
-    // const observacionesMod=aux[1]
     try {
-        // await HORARIO.findByIdAndUpdate({ _id: req.params.id }, {
-        //     descripcion: params.descripcion,
-        //     observaciones: observacionesMod,
-        //     cod: codMod,
-        //     tolerancia: params.tolerancia,
-        //     ingreso1: params.ingreso1,
-        //     salida1: params.salida1,
-        //     ingreso2: params.ingreso2,
-        //     salida2: params.salida2,
-        //     tipoHorario: params.tipoHorario,
-        //     feriado: params.feriado,
-        //     orden: params.orden,
-        //     est: params.est,
-        // })
-        // console.log(params)
+        const horario = await HORARIO.findById({ _id: req.params.id })
         await HORARIO.findByIdAndUpdate({ _id: req.params.id }, params)
+        await EMPLEADO.updateMany({ typeHorario: horario.descripcion },
+            {
+                $set: {
+                    typeHorario: params.descripcion,
+                    cod_estH: params.tipoHorario,
+                    ingreso1: params.ingreso1,
+                    salida1: params.salida1,
+                    ingreso2: params.ingreso2,
+                    salida2: params.salida2,
+                    cod_horario: params.cod
+                }
+            })
         res.status(200).json({ message: 'horario actualizado' })
     } catch (error) {
         console.log(error)
@@ -98,6 +92,17 @@ router.delete('/horario/:id', async (req, res) => {
     try {
         await HORARIO.findByIdAndDelete({ _id: params })
         res.status(200).json({ message: 'horario eliminado' })
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+//-----------------------CONSULTA DE HORARIOS-----------------------------
+router.get('/consulta', async (req, res) => {
+    const params = req.query
+    try {
+        const horario = await EMPLEADO.find({ CIEmp: params.cedula })
+        res.status(200).json(horario)
     } catch (error) {
         console.log(error)
     }
