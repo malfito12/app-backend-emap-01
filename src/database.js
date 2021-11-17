@@ -19,13 +19,6 @@ mongoose.connect("mongodb+srv://malfito12:vivabraun123@dbcluster.yhudn.mongodb.n
     useFindAndModify:false
 })
 
-// mongoose.connect(process.env.MONGO_URI,{
-//     useNewUrlParser: true,
-//     useCreateIndex: true,
-//     useUnifiedTopology: true,
-//     useFindAndModify:false
-// })
-
 const connection=mongoose.connection
 
 connection.once('open',()=>{
