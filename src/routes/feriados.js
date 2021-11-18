@@ -21,10 +21,16 @@ const EMPLEADO = require('../models/Empleado')
 
 router.post('/feriado', async (req, res) => {
     const params = req.body
-    const feriado = new FERIADO(params)
-    feriado.save().then(() => {
-        res.status(200).json({ message: 'feriado registrado' })
-    })
+    try {
+        if (params.fechaFeriadoIni <= params.fechaFeriadoFin) {
+            const feriado = new FERIADO(params)
+            feriado.save().then(() => {
+                res.status(200).json({ message: 'feriado registrado' })
+            })
+        }
+    } catch (error) {
+
+    }
 })
 
 router.get('/feriado', async (req, res) => {
@@ -32,11 +38,13 @@ router.get('/feriado', async (req, res) => {
     res.status(200).json(feriado)
 })
 
-router.put('/feriado/:id',async(req,res)=>{
-    const params=req.body
+router.put('/feriado/:id', async (req, res) => {
+    const params = req.body
     try {
-        await FERIADO.findByIdAndUpdate({_id:req.params.id},params)
-        res.status(200).json({message:'feriado actualizado'})
+        if (params.fechaFeriadoIni<=params.fechaFeriadoFin) {
+            await FERIADO.findByIdAndUpdate({ _id: req.params.id }, params)
+            res.status(200).json({ message: 'feriado actualizado' })
+        }
     } catch (error) {
         console.log(error)
     }

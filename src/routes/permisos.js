@@ -5,26 +5,28 @@ const EMPLEADO=require('../models/Empleado')
 
 router.post('/permiso',async(req,res)=>{
     const params=req.body
-    const empelado=await EMPLEADO.find()
+    const empleado=await EMPLEADO.find()
     var cont=0;
-    for(var i=0;i<empelado.length;i++){
-        if(params.id_bio==empelado[i].id_bio){
+    for(var i=0;i<empleado.length;i++){
+        if(params.id_bio==empleado[i].id_bio){
             cont++;
-            const permiso= new PERMISO({
-                id_bio: empelado[i].id_bio,
-                firstNameEmp: empelado[i].firstNameEmp,
-                lastNameEmpP: empelado[i].lastNameEmpP,
-                lastNameEmpM: empelado[i].lastNameEmpM,
-                CIEmp: empelado[i].CIEmp,
-                tipoPermiso:params.tipoPermiso,
-                namePermiso: params.namePermiso,
-                fechaPermisoIni:params.fechaPermisoIni,
-                fechaPermisoFin:params.fechaPermisoFin
-            })
-            permiso.save().then(()=>{
-                res.status(200).json({message:'permiso registrado'})
-            })
-            break;
+            if(params.fechaPermisoIni<=params.fechaPermisoFin){
+                const permiso= new PERMISO({
+                    id_bio: empleado[i].id_bio,
+                    firstNameEmp: empleado[i].firstNameEmp,
+                    lastNameEmpP: empleado[i].lastNameEmpP,
+                    lastNameEmpM: empleado[i].lastNameEmpM,
+                    CIEmp: empleado[i].CIEmp,
+                    tipoPermiso:params.tipoPermiso,
+                    namePermiso: params.namePermiso,
+                    fechaPermisoIni:params.fechaPermisoIni,
+                    fechaPermisoFin:params.fechaPermisoFin
+                })
+                permiso.save().then(()=>{
+                    res.status(200).json({message:'permiso registrado'})
+                })
+                break;
+            }
         }
     }
     if(cont==0) res.status(300).json({message:'empleado no encontrado'})
@@ -43,13 +45,20 @@ router.get('/permiso/:id',async(req,res)=>{
 
 router.put('/permiso/:id',async(req,res)=>{
     const params=req.body
-    await PERMISO.findByIdAndUpdate({_id: req.params.id},{
-        tipoPermiso:params.tipoPermiso,
-        namePermiso:params.namePermiso,
-        fechaPermisoIni:params.fechaPermisoIni,
-        fechaPermisoFin:params.fechaPermisoFin
-    })
-    res.status(200).json({message:'permiso editado'})
+    try {
+        if(params.fechaPermisoIni<=params.fechaPermisoFin){
+            console.log('si')
+            await PERMISO.findByIdAndUpdate({_id: req.params.id},{
+                tipoPermiso:params.tipoPermiso,
+                namePermiso:params.namePermiso,
+                fechaPermisoIni:params.fechaPermisoIni,
+                fechaPermisoFin:params.fechaPermisoFin
+            })
+            res.status(200).json({message:'permiso editado'})
+        }
+    } catch (error) {
+        
+    }
 })
 
 router.delete('/permiso/:id',async(req,res)=>{
@@ -57,6 +66,5 @@ router.delete('/permiso/:id',async(req,res)=>{
     await PERMISO.findByIdAndDelete({_id: params})
     res.status(200).json({message:'permiso eliminado'})
 })
-
 
 module.exports=router
