@@ -1940,6 +1940,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
         }
         else {
             //---------HORARIO NOCTURNO---------------------
+            // console.log('entra')
             for (var i = 0; i < contDias; i++) {
                 if (empleado[0].fechaini <= buscarFechaAux && empleado[0].fechafin >= buscarFechaAux) {
                     const getMarcacion = await ASIS.find({ "$and": [{ id_bio: params }, { fecha: buscarFechaAux }] })
@@ -1970,21 +1971,23 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     auxPrueba.push(getMarcacion[j].hora)
                                 }
                             }
+                            // console.log(auxPrueba)
                             //----------SI EXISTEN MARCACIONES SIGUIDAS CON MENOS DE 15 MIN-----
-                            for (var k = 0; k < auxPrueba.length; k++) {
-                                if (auxPrueba.length > k + 1) {
-                                    var hora1 = moment(`1990-01-01 ${auxPrueba[k]}`).add(15, 'm').format("HH:mm:ss")
-                                    var hora2 = moment(`1990-01-01 ${auxPrueba[k + 1]}`).format("HH:mm:ss")
-                                    if (hora2 < hora1) {
-                                        auxPrueba2.push(auxPrueba[k])
-                                        auxPrueba.splice(k + 1, 1)
-                                    }
-                                    else { auxPrueba2.push(auxPrueba[k]) }
-                                } else {
-                                    var hora = moment(`1990-01-01 ${auxPrueba[k]}`).format("HH:mm:ss")
-                                    auxPrueba2.push(hora)
-                                }
-                            }
+                            // for (var k = 0; k < auxPrueba.length; k++) {
+                            //     if (auxPrueba.length > k + 1) {
+                            //         var hora1 = moment(`1990-01-01 ${auxPrueba[k]}`).add(15, 'm').format("HH:mm:ss")
+                            //         var hora2 = moment(`1990-01-01 ${auxPrueba[k + 1]}`).format("HH:mm:ss")
+                            //         if (hora2 < hora1) {
+                            //             auxPrueba2.push(auxPrueba[k])
+                            //             auxPrueba.splice(k + 1, 1)
+                            //         }
+                            //         else { auxPrueba2.push(auxPrueba[k]) }
+                            //     } else {
+                            //         var hora = moment(`1990-01-01 ${auxPrueba[k]}`).format("HH:mm:ss")
+                            //         auxPrueba2.push(hora)
+                            //     }
+                            // }
+                            // console.log(auxPrueba2)
                             //----------------ATRASOS NOCTURNOS--------------------------
                             const atrasoNoc = (a) => {
                                 // var data=moment()
@@ -2028,21 +2031,21 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 }
                             }
                             //--------------PRUEBAS MARCACIONES--------------------------
-                            const numAux = auxPrueba2.length
-                            if (auxPrueba2.length > 0) {
-                                const { duration, result } = horasTrabajo(auxPrueba2[0])
+                            const numAux = auxPrueba.length
+                            if (auxPrueba.length > 0) {
                                 if (numAux == 1) {
+                                    const { duration, result } = horasTrabajo(auxPrueba[0])
                                     //NO ENTRO DIA ANTES PERO SI AL DIAL ACTUAL
                                     auxPrueba3.push({
                                         id_bio: params,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
                                         ingreso1: '00:00:00',
-                                        salida1: auxPrueba2[0],
+                                        salida1: auxPrueba[0],
                                         ingreso2: '00:00:00',
                                         salida2: '00:00:00',
                                         atraso: '00:00:00',
-                                        horasExtra: horasExtraNoc(auxPrueba2[0]),
+                                        horasExtra: horasExtraNoc(auxPrueba[0]),
                                         diaTrabajado: '1.0',
                                         horasDeTrabajo: duration.toFixed(2),
                                         faltas: result.toFixed(2),
@@ -2052,17 +2055,17 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 }
                                 else if (numAux == 2) {
                                     //ENTRÓ AL DIA ANTES Y TAMBIEN AL DIA ACTUAL
-                                    const { duration, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1])
+                                    const { duration, result } = horasTrabajo(auxPrueba[0], auxPrueba[1])
                                     auxPrueba3.push({
                                         id_bio: params,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
-                                        ingreso1: auxPrueba2[0],
-                                        salida1: auxPrueba2[1],
+                                        ingreso1: auxPrueba[0],
+                                        salida1: auxPrueba[1],
                                         ingreso2: '00:00:00',
                                         salida2: '00:00:00',
-                                        atraso: atrasoNoc(auxPrueba2[0]),
-                                        horasExtra: horasExtraNoc(auxPrueba2[1]),
+                                        atraso: atrasoNoc(auxPrueba[0]),
+                                        horasExtra: horasExtraNoc(auxPrueba[1]),
                                         diaTrabajado: '1.0',
                                         horasDeTrabajo: duration.toFixed(2),
                                         faltas: result.toFixed(2),
@@ -2281,7 +2284,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
                             }
                         } else {
-                            //---SI NO EXISTE MARCACION DIAL ACTUAL NI DIA ANTES--------------
+                            //---SI NO EXISTE MARCACION DIA ACTUAL NI DIA ANTES--------------
                             var suma = 0;
                             var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
                             var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
