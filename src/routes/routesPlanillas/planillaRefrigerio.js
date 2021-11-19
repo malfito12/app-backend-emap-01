@@ -119,7 +119,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
 
                     //------------------------------------------
                     array.push({
@@ -234,8 +237,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
-
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
                     //------------------------------------------
                     array.push({
                         itemEmp: empleado[i].itemEmp,
@@ -350,8 +355,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
-
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
                     //------------------------------------------
                     array.push({
                         itemEmp: empleado[i].itemEmp,
@@ -465,8 +472,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
-
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
                     //------------------------------------------
                     array.push({
                         itemEmp: empleado[i].itemEmp,
@@ -593,8 +602,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
-
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
                     //------------------------------------------
                     array.push({
                         itemEmp: empleado[i].itemEmp,
@@ -708,8 +719,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
-
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
                     //------------------------------------------
                     array.push({
                         itemEmp: empleado[i].itemEmp,
@@ -824,8 +837,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
-
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
                     //------------------------------------------
                     array.push({
                         itemEmp: empleado[i].itemEmp,
@@ -939,8 +954,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                     //-----------------OTROS DESCUENTOS-----------------------
                     const otrosDes = 0
                     //-----------------LIQUIDO PAGABLE-----------------------
-                    const totalPagable = ganadoTotal - otrosDes
-
+                    var totalPagable = ganadoTotal - otrosDes
+                    if(totalPagable<0){
+                        totalPagable=0
+                    }
                     //------------------------------------------
                     array.push({
                         itemEmp: empleado[i].itemEmp,

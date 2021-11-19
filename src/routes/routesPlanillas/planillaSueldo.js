@@ -261,7 +261,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
@@ -510,7 +513,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
@@ -756,7 +762,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
@@ -1000,7 +1009,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
@@ -1248,7 +1260,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
@@ -1476,7 +1491,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
@@ -1700,7 +1718,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
@@ -1923,7 +1944,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     //---------------TOTAL DESCUENTO---------------------------
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
-                    const totalLiquido = totalIngreso - totalDesc
+                    var totalLiquido = totalIngreso - totalDesc
+                    if(totalLiquido<0){
+                        totalLiquido=0
+                    }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
