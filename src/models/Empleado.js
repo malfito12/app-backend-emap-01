@@ -1,5 +1,5 @@
-var mongoose=require('../database')
-var EMPLEADOSCHEMA={
+const mongoose=require('../database')
+const EMPLEADOSCHEMA={
     id_bio:{
         type:String,
         require:true,

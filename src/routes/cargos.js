@@ -157,7 +157,7 @@ router.put('/cargo/:id', async (req, res) => {
     try {
         const cargo=await CARGO.findById({_id:req.params.id})
         await CARGO.findByIdAndUpdate({_id:req.params.id},params)
-        await EMPLEADO.updateMany({departamentEmp:cargo.nameDepartament,cargoEmp:cargo.nameCargo},{$set:{departamentEmp:params.nameDepartament,cargoEmp:params.nameCargo}})
+        await EMPLEADO.updateMany({departamentEmp:cargo.nameDepartament,cargoEmp:cargo.nameCargo},{$set:{departamentEmp:params.nameDepartament,cargoEmp:params.nameCargo,haber_basico:params.haber_basico}})
         // await CARGO.findByIdAndUpdate({ _id: req.params.id }, {
         //     cod_cargo: params.cod_cargo,
         //     nameCargo: params.nameCargo,

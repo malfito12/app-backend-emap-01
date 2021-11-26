@@ -9,15 +9,17 @@ const KARDEXASISTENCIA = require('../../models/modelsPlanillas/KardexAsistencia'
 const VACACION = require('../../models/Vacaciones')
 
 
-router.get('/sueldo/:id', async (req, res) => {
-    const params = req.params.id
-    const fechas = req.query
-    const empleado = await EMPLEADO.find({ id_bio: params })
-    if (empleado != 0) {
-        // console.log(codHorario)
-        var fechaini = new Date(empleado[0].fechaini)
-        var fechafin = new Date(empleado[0].fechafin)
-        //----sumar dias de contrato-----------------------------
+//----------------------REGISTRO DE TODAS LAS MARCACIONES------------------------
+router.post("/registerAllMarcaciones", async (req, res) => {
+    const params = req.body
+    // console.log(params)
+    const empleado = await EMPLEADO.find({ estadoEmp: 'activo' }).sort({id_bio:1})
+    const contEmpleado = empleado.length
+    // console.log(empleado)
+    for (var a = 0; a < contEmpleado; a++) {
+        var fechaini = new Date(empleado[a].fechaini)
+        var fechafin = new Date(empleado[a].fechafin)
+        //SUMAR DIAS DE CONTRATO
         var contFechas = 0
         const sumarDias = (fechaini, dias) => {
             fechaini.setDate(fechaini.getDate() + dias)
@@ -28,10 +30,10 @@ router.get('/sueldo/:id', async (req, res) => {
             contFechas++
         }
         //------busqueda de fechas ----------------------
-        var buscarFechaIni = new Date(fechas.fechaini)
-        var buscarFechaFin = new Date(fechas.fechafin)
-        var buscarFechaFinAux = moment(fechas.fechafin) // auxiliar para el caso de permisos y feriados que no entren al primer if por culpa de moment()
-        var buscarFechaAux = moment(fechas.fechaini).format('YYYY-MM-DD')
+        var buscarFechaIni = new Date(params.fechaini)
+        var buscarFechaFin = new Date(params.fechafin)
+        var buscarFechaFinAux = moment(params.fechafin) // auxiliar para el caso de permisos y feriados que no entren al primer if por culpa de moment()
+        var buscarFechaAux = moment(params.fechaini).format('YYYY-MM-DD')
 
         var contDias = 0
         const contarDias = (buscarFechaIni, dias) => {
@@ -42,40 +44,40 @@ router.get('/sueldo/:id', async (req, res) => {
             contarDias(buscarFechaIni, 1)
             contDias++
         }
+        // console.log(contDias)
         //--------HORARIOS----------------------------
-        //-----------OPCION 1------------------------
-        const a = moment(`1990-01-01 ${empleado[0].ingreso1}`).subtract(2, 'h').format('HH:mm:ss')
-        const b = moment(`1990-01-01 ${empleado[0].ingreso1}`).add(2, 'h').format('HH:mm:ss')
-        const c = moment(`1990-01-01 ${empleado[0].salida1}`).add(1, 'h').format('HH:mm:ss')
-        const d = moment(`1990-01-01 ${empleado[0].ingreso2}`).add(2, 'h').format('HH:mm:ss')
-        const e = moment(`1990-01-01 ${empleado[0].salida2}`).add(2, 'h').format('HH:mm:ss')
-        //------------OPCION 2----------------------------
-        const aa = moment(`1990-01-01 ${empleado[0].ingreso1}`).subtract(2, 'h')
-        const bb = moment(`1990-01-01 ${empleado[0].ingreso1}`).add(2, 'h')
-        const cc = moment(`1990-01-01 ${empleado[0].salida1}`).add(1, 'h')
-        const dd = moment(`1990-01-01 ${empleado[0].ingreso2}`).add(2, 'h')
-        const ee = moment(`1990-01-01 ${empleado[0].salida2}`).add(2, 'h')
-        // console.log(aa)
-        // console.log(bb)
-        // console.log(cc)
-        // console.log(dd)
-        // console.log(ee)
-        //-------------------NOCTURNOS----------------------------
-        const ingreNoc = moment(`1990-01-01 ${empleado[0].ingreso1}`).subtract(1, 'h').format("HH:mm:ss")
-        const salidaNoc = moment(`1990-01-01 ${empleado[0].salida1}`).add(2, 'h').format("HH:mm:ss")
-        var toleranciaNoc = moment(`1990-01-01 ${empleado[0].ingreso1}`).add(empleado[0].tolerancia, 'm').format("HH:mm:ss")
-        var horaExtraNoc = moment(`1990-01-01 ${empleado[0].salida1}`).format("HH:mm:ss")
+        var tolerancia1
+        var tolerancia2
+        var horaextra1
+        var horaextra2
 
-        //--------TOLERANCIAS--------------------------
-        const tolerancia = empleado[0].tolerancia
-        var tolerancia1 = moment(`1990-01-01 ${empleado[0].ingreso1}`).add(tolerancia, 'm').format("HH:mm:ss")
-        var tolerancia2 = moment(`1990-01-01 ${empleado[0].ingreso2}`).add(tolerancia, 'm').format("HH:mm:ss")
+        var ingreNoc
+        var salidaNoc
+        var toleranciaNoc
+        var horaExtraNoc
 
-        //--------HORAS EXTRAS--------------------------
-        var horaextra1 = moment(`1990-01-01 ${empleado[0].salida1}`).format("HH:mm:ss")
-        var horaextra2 = moment(`1990-01-01 ${empleado[0].salida2}`).format("HH:mm:ss")
+        if (empleado[a].cod_estH === '1') {
+            // console.log('entra a diurnos')
+            console.log(empleado[a].id_bio)
+            //--------TOLERANCIAS--------------------------
+            const tolerancia = empleado[a].tolerancia
+            tolerancia1 = moment(`1990-01-01 ${empleado[a].ingreso1}`).add(tolerancia, 'm').format("HH:mm:ss")
+            tolerancia2 = moment(`1990-01-01 ${empleado[a].ingreso2}`).add(tolerancia, 'm').format("HH:mm:ss")
+
+            //--------HORAS EXTRAS--------------------------
+            horaextra1 = moment(`1990-01-01 ${empleado[a].salida1}`).format("HH:mm:ss")
+            horaextra2 = moment(`1990-01-01 ${empleado[a].salida2}`).format("HH:mm:ss")
+        } else if(empleado[a].cod_estH==='2') {
+            // console.log('entra a nocturnos')
+            //-------------------NOCTURNOS----------------------------
+            ingreNoc = moment(`1990-01-01 ${empleado[a].ingreso1}`).subtract(1, 'h').format("HH:mm:ss")
+            salidaNoc = moment(`1990-01-01 ${empleado[a].salida1}`).add(2, 'h').format("HH:mm:ss")
+            //------------TOLERANCIA NOCTURNOS------------------
+            toleranciaNoc = moment(`1990-01-01 ${empleado[a].ingreso1}`).add(empleado[a].tolerancia, 'm').format("HH:mm:ss")
+            horaExtraNoc = moment(`1990-01-01 ${empleado[a].salida1}`).format("HH:mm:ss")
+        }
         //-------------------OBTENER EL CODIGO DE HORARIO----------------------
-        var codHorario = empleado[0].cod_horario
+        var codHorario = empleado[a].cod_horario
         codHorario = codHorario.split("")
         arrayDiasTrabajo = []
         if (codHorario[0] === '1') {
@@ -104,53 +106,29 @@ router.get('/sueldo/:id', async (req, res) => {
         var array = []
         var auxPrueba3 = []
 
-        //------------HORARIO CONTINUO----------------------------
-
-        if (empleado[0].cod_estH == "1") {
-            //---------------HORARIO DIURNO-------------------------
+        //------------HORARIO DIURNO----------------------------
+        if (empleado[a].cod_estH === '1') {
             for (var i = 0; i < contDias; i++) {
-                if (empleado[0].fechaini <= buscarFechaAux && empleado[0].fechafin >= buscarFechaAux) {
+                if (empleado[a].fechaini <= buscarFechaAux && empleado[a].fechafin >= buscarFechaAux) {
                     //SI ESTA DENTRO DEL PARAMETRO FECHAS DE CONTRATO
-                    const getMarcacion = await ASIS.find({ "$and": [{ id_bio: params }, { fecha: buscarFechaAux }] })
+                    const getMarcacion = await ASIS.find({ "$and": [{ id_bio: empleado[a].id_bio }, { fecha: buscarFechaAux }] })
                     var nameDay = moment(buscarFechaAux).locale('es').format('dddd')
-                    // if (nameDay === 'lunes' || nameDay === 'martes' || nameDay === 'miércoles' || nameDay === 'jueves' || nameDay === 'viernes') {
                     if (nameDay === arrayDiasTrabajo[0] || nameDay === arrayDiasTrabajo[1] || nameDay === arrayDiasTrabajo[2] || nameDay === arrayDiasTrabajo[3] || nameDay === arrayDiasTrabajo[4] || nameDay === arrayDiasTrabajo[5] || nameDay === arrayDiasTrabajo[6]) {
-
-                        var contIngreso1 = '0'
-                        var contSalida1 = '0'
-                        var contIngreso2 = '0'
-                        var contSalida2 = '0'
-                        var result;
-                        var aux = []
                         var auxPrueba = []
                         var auxPrueba2 = []
-                        // if (getMarcacion != "") {
                         if (getMarcacion.length > 0) {
                             //SI EXISTE MARCACION
                             const num = getMarcacion.length
                             const buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
+                            var buscarVacacion = await VACACION.find({ '$and': [{ id_bio: empleado[a].id_bio }, { fechaVacacionIni: buscarFechaAux }] })
                             if (buscarFeriado.length > 0) {
+                                //----FERIADOS------------------
                                 var suma = 0;
                                 var diaFeriado = nameDay
                                 var desde = moment(buscarFeriado[0].fechaFeriadoIni, 'YYYY-MM-DD')
                                 var hasta = moment(buscarFeriado[0].fechaFeriadoFin, 'YYYY-MM-DD')
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
-                                        array.push({
-                                            id_bio: params,
-                                            dia: diaFeriado,
-                                            fecha: moment(desde).format('YYYY-MM-DD'),
-                                            ingreso1: '00:00:00',
-                                            salida1: '00:00:00',
-                                            ingreso2: '00:00:00',
-                                            salida2: '00:00:00',
-                                            atraso: '00:00:00',
-                                            horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
-                                            diaTrabajado: '1.0',
-                                            faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
-                                        })
                                         auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaFeriado,
@@ -161,10 +139,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -174,21 +153,6 @@ router.get('/sueldo/:id', async (req, res) => {
                                     i--
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
-                                        array.push({
-                                            id_bio: params,
-                                            dia: diaFeriado,
-                                            fecha: moment(desde).format('YYYY-MM-DD'),
-                                            ingreso1: '00:00:00',
-                                            salida1: '00:00:00',
-                                            ingreso2: '00:00:00',
-                                            salida2: '00:00:00',
-                                            atraso: '00:00:00',
-                                            horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
-                                            diaTrabajado: '1.0',
-                                            faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
-                                        })
                                         auxPrueba3.push({
                                             id_bio: params,
                                             dia: diaFeriado,
@@ -199,10 +163,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -212,14 +177,67 @@ router.get('/sueldo/:id', async (req, res) => {
                                     i--;
                                 }
                                 buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
-                            } else {
-                                //--------------------PRUEBAS -------------------------------------------------
-                                // console.log(getMarcacion)
-                                console.log('entra')
+                            }
+                            else if (buscarVacacion.length > 0) {
+                                var diaVacacion = nameDay
+                                var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
+                                if (hasta <= buscarFechaFin) {
+                                    while (desde.isSameOrBefore(hasta)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format("YYYY-MM-DD"),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++
+                                    }
+                                    i = i + suma;
+                                    i--;
+                                } else if (hasta >= buscarFechaFinAux) {
+                                    while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                        auxPrueba3.push({
+                                            id_bio: params,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format('YYYY-MM-DD'),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++;
+                                    }
+                                    i = i + suma;
+                                    i--
+                                }
+                            }
+                            else {
+                                //---------------PRUEBAS-----------------
                                 for (var n = 0; n < num; n++) {
                                     auxPrueba.push(getMarcacion[n].hora)
                                 }
-                                // console.log(auxPrueba)
+                                //----CALCULOS PARA MARCACIONES CON DIFERENCIA DE 15MIN------
                                 for (var m = 0; m < auxPrueba.length; m++) {
                                     if (auxPrueba.length > m + 1) {
                                         var hora1 = moment(`1990-01-01 ${auxPrueba[m]}`).add(15, 'm').format("HH:mm:ss")
@@ -238,53 +256,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                         // console.log(hora)
                                     }
                                 }
-                                // console.log(auxPrueba2)
-
-
                                 //------------------------HORARIO NOCTURNO-------------------------------------------
-
-                                //-------------------------------------------------------------------------
-                                //-------------------------------------------------------------------------
-                                for (var j = 0; j < num; j++) {
-                                    //--------------------OPCION 1--------------------------------------
-                                    // if (getMarcacion[j].hora >= a && getMarcacion[j].hora <= b) {
-                                    //     contIngreso1 = '1'
-                                    //     aux.push({ hora: getMarcacion[j].hora })
-                                    // } else if (getMarcacion[j].hora > b && getMarcacion[j].hora <= c) {
-                                    //     contSalida1 = '1'
-                                    //     aux.push({ hora: getMarcacion[j].hora })
-                                    //     // console.log('salida 1')
-                                    // } else if (getMarcacion[j].hora > c && getMarcacion[j].hora <= d) {
-                                    //     contIngreso2 = '1'
-                                    //     aux.push({ hora: getMarcacion[j].hora })
-                                    //     // console.log('ingreso 2')
-                                    // } else if (getMarcacion[j].hora > d && getMarcacion[j].hora <= e) {
-                                    //     contSalida2 = '1'
-                                    //     aux.push({ hora: getMarcacion[j].hora })
-                                    //     // console.log('salida 2')
-                                    // } else { console.log('fuera de horario') }
-                                    //------------------------OPCION 2----------------------------------------
-                                    var cambio = moment(`1990-01-01 ${getMarcacion[j].hora}`)
-                                    // console.log(cambio)
-                                    if (cambio >= aa && cambio <= bb) {
-                                        contIngreso1 = '1'
-                                        aux.push({ hora: getMarcacion[j].hora })
-                                    } else if (cambio > bb && cambio <= cc) {
-                                        contSalida1 = '1'
-                                        aux.push({ hora: getMarcacion[j].hora })
-                                        // console.log('salida 1')
-                                    } else if (cambio > cc && cambio <= dd) {
-                                        contIngreso2 = '1'
-                                        aux.push({ hora: getMarcacion[j].hora })
-                                        // console.log('ingreso 2')
-                                    } else if (cambio > dd && cambio <= ee) {
-                                        contSalida2 = '1'
-                                        aux.push({ hora: getMarcacion[j].hora })
-                                        // console.log('salida 2')
-                                    } else { console.log('fuera de horario') }
-                                }
-                                // console.log(aux)
-                                result = contIngreso1 + contSalida1 + contIngreso2 + contSalida2
                                 //-----------ATRASOS----------------------------------
                                 const una = new Date('1990-01-01 00:00:00')
                                 const atraso = (a, b) => {
@@ -345,37 +317,63 @@ router.get('/sueldo/:id', async (req, res) => {
                                     } else return moment(dos).format("HH:mm:ss")
                                 }
                                 //-----------------HORAS DE TRABAJO---------------------
-                                // const horasTrabajo = (a, b, c, d) => {
-                                //     console.log(a)
-                                //     console.log(b)
-                                //     console.log(c)
-                                //     console.log(d)
-                                //     var hora1=moment(a)
-                                // }
-                                const entrada1 = (a, b) => {
+                                const horasTrabajo = (a, b, c, d) => {
+                                    if (a != undefined && b != undefined && c != undefined && d != undefined) {
+                                        var data1 = moment(`1990-01-01 ${a}`)
+                                        var data2 = moment(`1990-01-01 ${b}`)
+                                        var data3 = moment(`1990-01-01 ${c}`)
+                                        var data4 = moment(`1990-01-01 ${d}`)
+                                        var duration1 = moment.duration(data2.diff(data1)).asHours()
+                                        var duration2 = moment.duration(data4.diff(data3)).asHours()
+                                        var durationTotal = duration1 + duration2
+                                        var result = 0;
+                                        if (durationTotal > 7) {
+                                            result = 0
+                                        } else { result = 0.5 }
+                                        return { durationTotal, result }
+
+                                    }
+                                    else if (a != undefined && b != undefined && c != undefined) {
+                                        var data1 = moment(`1990-01-01 ${a}`)
+                                        var data2 = moment(`1990-01-01 ${b}`)
+                                        // var duration=moment.duration(data2.diff(data1)).asMinutes()
+                                        var duration = moment.duration(data2.diff(data1)).asHours()
+                                        var result = 0;
+                                        if (duration > 7) {
+                                            result = 0
+                                        } else {
+                                            result = 0.5
+                                        }
+                                        return { duration, result }
+
+                                    }
+                                    else if (a != undefined && b != undefined) {
+                                        var data1 = moment(`1990-01-01 ${a}`)
+                                        var data2 = moment(`1990-01-01 ${b}`)
+                                        // var duration=moment.duration(data2.diff(data1)).asMinutes()
+                                        var duration = moment.duration(data2.diff(data1)).asHours()
+                                        var result = 0;
+                                        if (duration > 7) {
+                                            result = 0
+                                        } else {
+                                            result = 0.5
+                                        }
+                                        return { duration, result }
+
+                                    } else if (a != undefined || b != undefined || c != undefined || d != undefined) {
+                                        var duration = 0
+                                        var result = 0.5
+                                        return { duration, result }
+                                    }
+
 
                                 }
-                                const entrada2 = (c, d) => {
-
-                                }
-                                // const prueba=()=>{
-                                //     const hora1=moment("2000-01-01 23:20:00","YYYY-MM-DD HH:mm:ss")
-                                //     const hora2=moment("2000-01-02 02:25:00","YYYY-MM-DD HH:mm:ss")
-                                //     const result1=hora2.diff(hora1,'hours')
-                                //     const result2=hora2.diff(hora1,'m')
-                                //     const horaprueba=moment("2000-01-02 23:00:00","YYYY-MM-DD HH:mm:ss").add(2,'h')
-                                //     // console.log(hora1)
-                                //     // console.log(hora2)
-                                //     // console.log(result1)
-                                //     // console.log(result2)
-                                //     // console.log(horaprueba)
-                                // }
-                                // prueba()
                                 //-------------------------PRUEBAS MARCACIONES------------------------
                                 const numAux = auxPrueba2.length
                                 if (numAux == 1) {
+                                    const { duration, result } = horasTrabajo(auxPrueba2[0])
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
                                         ingreso1: auxPrueba2[0],
@@ -383,15 +381,19 @@ router.get('/sueldo/:id', async (req, res) => {
                                         ingreso2: '00:00:00',
                                         salida2: '00:00:00',
                                         atraso: atraso(auxPrueba2[0]),
-                                        // horasExtra: horasExtra(aux[0].hora),
+                                        horasExtra: "00:00:00",
                                         diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
+                                        horasDeTrabajo: duration.toFixed(2),
+                                        faltas: result.toFixed(2),
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 2) {
+                                    const { duration, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1])
+
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
                                         ingreso1: auxPrueba2[0],
@@ -400,14 +402,17 @@ router.get('/sueldo/:id', async (req, res) => {
                                         salida2: '00:00:00',
                                         atraso: atraso(auxPrueba2[0]),
                                         horasExtra: horasExtra(auxPrueba2[1]),
+                                        horasDeTrabajo: duration.toFixed(2),
                                         diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
+                                        faltas: result.toFixed(2),
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 3) {
+                                    const { duration, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1])
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
                                         ingreso1: auxPrueba2[0],
@@ -416,14 +421,17 @@ router.get('/sueldo/:id', async (req, res) => {
                                         salida2: '00:00:00',
                                         atraso: atraso(auxPrueba2[0], auxPrueba2[2]),
                                         horasExtra: horasExtra(auxPrueba2[1]),
+                                        horasDeTrabajo: duration.toFixed(2),
                                         diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
+                                        faltas: result.toFixed(2),
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 4) {
+                                    const { durationTotal, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1], auxPrueba2[2], auxPrueba2[3])
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
                                         ingreso1: auxPrueba2[0],
@@ -432,302 +440,31 @@ router.get('/sueldo/:id', async (req, res) => {
                                         salida2: auxPrueba2[3],
                                         atraso: atraso(auxPrueba2[0], auxPrueba2[2]),
                                         horasExtra: horasExtra(auxPrueba2[1], auxPrueba2[3]),
+                                        horasDeTrabajo: durationTotal.toFixed(2),
                                         diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: ''
+                                        faltas: result.toFixed(2),
+                                        observaciones: '',
+                                        observaciones2: "",
                                     })
                                 }
+
                                 //------------------------------------------------------
-                                //-----------------LLENADO DE MARCACIONES POR FECHA---------------------
-                                if (result === '0000') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: '00:00:00',
-                                        ingreso2: '00:00:00',
-                                        salida2: '00:00:00',
-                                        atraso: '00:00:00',
-                                        horasExtra: '00:00:00',
-                                        diaTrabajado: '0.0',
-                                        faltas: '0.0',
-                                        observaciones: 'fuera de horario'
-                                    })
-                                }
-                                else if (result === '0001') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: '00:00:00',
-                                        ingreso2: '00:00:00',
-                                        salida2: aux[0].hora,
-                                        // atraso: atraso(aux[0].hora),
-                                        horasExtra: horasExtra(aux[0].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '0010') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: '00:00:00',
-                                        ingreso2: aux[0].hora,
-                                        atraso: atraso(aux[0].hora),
-                                        horasExtra: '00:00:00',
-                                        salida2: '00:00:00',
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '0011') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: '00:00:00',
-                                        ingreso2: aux[0].hora,
-                                        salida2: aux[1].hora,
-                                        atraso: atraso(aux[0].hora),
-                                        horasExtra: horasExtra(aux[1].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '0100') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: aux[0].hora,
-                                        ingreso2: '00:00:00',
-                                        salida2: '00:00:00',
-                                        atraso: '00:00:00',
-                                        horasExtra: horasExtra(aux[0].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '0101') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: aux[0].hora,
-                                        ingreso2: '00:00:00',
-                                        salida2: aux[1].hora,
-                                        atraso: '00:00:00',
-                                        horasExtra: horasExtra(aux[0].hora, aux[1].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '0110') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: aux[0].hora,
-                                        ingreso2: aux[1].hora,
-                                        salida2: '00:00:00',
-                                        atraso: atraso(aux[1].hora),
-                                        horasExtra: horasExtra(aux[0].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '0111') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: '00:00:00',
-                                        salida1: aux[0].hora,
-                                        ingreso2: aux[1].hora,
-                                        salida2: aux[2].hora,
-                                        atraso: atraso(aux[1].hora),
-                                        horasExtra: horasExtra(aux[0].hora, aux[2].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1000') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: '00:00:00',
-                                        ingreso2: '00:00:00',
-                                        salida2: '00:00:00',
-                                        atraso: atraso(aux[0].hora),
-                                        horasExtra: '00:00:00',
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1001') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: '00:00:00',
-                                        ingreso2: '00:00:00',
-                                        salida2: aux[1].hora,
-                                        atraso: atraso(aux[0].hora),
-                                        horasExtra: horasExtra(aux[1].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1010') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: '00:00:00',
-                                        ingreso2: aux[1].hora,
-                                        salida2: '00:00:00',
-                                        atraso: atraso(aux[0].hora, aux[1].hora),
-                                        horasExtra: '00:00:00',
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1011') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: '00:00:00',
-                                        ingreso2: aux[1].hora,
-                                        salida2: aux[2].hora,
-                                        atraso: atraso(aux[0].hora, aux[1].hora),
-                                        horasExtra: horasExtra(aux[2].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1100') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: aux[1].hora,
-                                        ingreso2: '00:00:00',
-                                        salida2: '00:00:00',
-                                        atraso: atraso(aux[0].hora),
-                                        horasExtra: horasExtra(aux[1].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1101') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: aux[1].hora,
-                                        ingreso2: '00:00:00',
-                                        salida2: aux[2].hora,
-                                        atraso: atraso(aux[0].hora),
-                                        horasExtra: horasExtra(aux[1].hora, aux[2].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1110') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: aux[1].hora,
-                                        ingreso2: aux[2].hora,
-                                        salida2: '00:00:00',
-                                        atraso: atraso(aux[0].hora, aux[2].hora),
-                                        horasExtra: horasExtra(aux[1].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-                                else if (result === '1111') {
-                                    array.push({
-                                        id_bio: params,
-                                        fecha: buscarFechaAux,
-                                        dia: nameDay,
-                                        ingreso1: aux[0].hora,
-                                        salida1: aux[1].hora,
-                                        ingreso2: aux[2].hora,
-                                        salida2: aux[3].hora,
-                                        atraso: atraso(aux[0].hora, aux[2].hora),
-                                        horasExtra: horasExtra(aux[1].hora, aux[3].hora),
-                                        diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
-
-                                    })
-                                }
-
                                 buscarFechaAux = moment(buscarFechaAux).add(1, 'day').format('YYYY-MM-DD')
-
                             }
-                            // console.log(result)
                         } else {
-                            // SI NO EXISTE MARCACION ---------------------
+                            //SI NO EXISTE MARCACION
                             var suma = 0;
-                            var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
+                            var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: empleado[a].id_bio }, { fechaPermisoIni: buscarFechaAux }] })
                             var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
+                            var buscarVacacion = await VACACION.find({ "$and": [{ id_bio: empleado[a].id_bio }, { fechaVacacionIni: buscarFechaAux }] })
                             if (buscarPermiso != 0) {
                                 var diaPermiso = nameDay
                                 var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
                                 var hasta = moment(buscarPermiso[0].fechaPermisoFin, "YYYY-MM-DD")
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
-                                        array.push({
-                                            id_bio: params,
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaPermiso,
                                             fecha: moment(desde).format("YYYY-MM-DD"),
                                             ingreso1: '00:00:00',
@@ -736,10 +473,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
@@ -749,8 +487,8 @@ router.get('/sueldo/:id', async (req, res) => {
                                     i--;
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
-                                        array.push({
-                                            id_bio: params,
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaPermiso,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -759,13 +497,68 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
+                                        suma++;
+                                    }
+                                    i = i + suma;
+                                    i--
+                                }
+                            }
+                            else if (buscarVacacion.length > 0) {
+                                var diaVacacion = nameDay
+                                var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
+                                if (hasta <= buscarFechaFin) {
+                                    while (desde.isSameOrBefore(hasta)) {
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format("YYYY-MM-DD"),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++
+                                    }
+                                    i = i + suma;
+                                    i--;
+                                } else if (hasta >= buscarFechaFinAux) {
+                                    while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format('YYYY-MM-DD'),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
                                         suma++;
                                     }
                                     i = i + suma;
@@ -778,8 +571,8 @@ router.get('/sueldo/:id', async (req, res) => {
                                 var hasta = moment(buscarFeriado[0].fechaFeriadoFin, 'YYYY-MM-DD')
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
-                                        array.push({
-                                            id_bio: params,
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -788,10 +581,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -801,8 +595,8 @@ router.get('/sueldo/:id', async (req, res) => {
                                     i--
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
-                                        array.push({
-                                            id_bio: params,
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -811,10 +605,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -825,8 +620,8 @@ router.get('/sueldo/:id', async (req, res) => {
                                 }
                             }
                             else {
-                                array.push({
-                                    id_bio: params,
+                                auxPrueba3.push({
+                                    id_bio: empleado[a].id_bio,
                                     dia: nameDay,
                                     fecha: buscarFechaAux,
                                     ingreso1: '00:00:00',
@@ -835,65 +630,40 @@ router.get('/sueldo/:id', async (req, res) => {
                                     salida2: '00:00:00',
                                     atraso: '00:00:00',
                                     horasExtra: '00:00:00',
-                                    horasTrabajo: '00:00:00',
+                                    horasDeTrabajo: "0:00",
                                     diaTrabajado: '0.0',
                                     faltas: '1.0',
-                                    observaciones: 'Falta'
+                                    observaciones: 'Falta',
+                                    observaciones2: "Falta",
                                 })
                                 suma++;
                             }
 
                             // console.log('no')
                             buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
-                            // result = contIngreso1 + contSalida1 + contIngreso2 + contSalida2
-                            // console.log(result)
-
                         }
-                        // console.log(nameDay + ' <----')
                     } else {
                         //-------------------SI NO ESTA PROGRAMADO EN EL COD-HORARIO-------------
                         buscarFechaAux = moment(buscarFechaAux).add(1, 'day').format('YYYY-MM-DD')
-                        // console.log(nameDay + '---->')
                     }
                 } else {
                     //SI NO ESTA DENTRO DEL PARAMETRO FECHAS DE CONTRATO
                     buscarFechaAux = moment(buscarFechaAux).add(1, 'day').format('YYYY-MM-DD')
-                    // console.log(' no entra') 
                 }
-                // console.log(aux)
             }
-
-        } else {
-            console.log('entra')
-            //---------------HORARIO NOCTURNO------------------------
+        }
+        else {
+            //---------HORARIO NOCTURNO---------------------
+            // console.log('entra')
             for (var i = 0; i < contDias; i++) {
-                if (empleado[0].fechaini <= buscarFechaAux && empleado[0].fechafin >= buscarFechaAux) {
-                    const getMarcacion = await ASIS.find({ "$and": [{ id_bio: params }, { fecha: buscarFechaAux }] })
+                if (empleado[a].fechaini <= buscarFechaAux && empleado[a].fechafin >= buscarFechaAux) {
+                    const getMarcacion = await ASIS.find({ "$and": [{ id_bio: empleado[a].id_bio }, { fecha: buscarFechaAux }] })
                     var nameDay = moment(buscarFechaAux).locale('es').format('dddd')
-                    // console.log(buscarFechaAux)
                     if (nameDay === arrayDiasTrabajo[0] || nameDay === arrayDiasTrabajo[1] || nameDay === arrayDiasTrabajo[2] || nameDay === arrayDiasTrabajo[3] || nameDay === arrayDiasTrabajo[4] || nameDay === arrayDiasTrabajo[5] || nameDay === arrayDiasTrabajo[6]) {
                         var auxPrueba = []
                         var auxPrueba2 = []
                         var unDiaMenos = moment(buscarFechaAux).subtract(1, 'day').format("YYYY-MM-DD")
-                        const getMarcacion2 = await ASIS.find({ "$and": [{ id_bio: params }, { fecha: unDiaMenos }] })
-                        //----------------------------------
-                        // if (getMarcacion2.length > 0) {
-                        //     //CALCULOS DE MARCACION DIA ANTES
-                        //     const contMarcacion = getMarcacion2.length
-                        //     for (var m = 0; m < contMarcacion; m++) {
-                        //         var n = moment(`1990-01-01 ${getMarcacion2[m].hora}`).format("HH:mm:ss")
-                        //         if (n > ingreNoc) {
-                        //             auxPrueba.push(getMarcacion2[m].hora)
-                        //         }
-                        //         else { contador1++ }
-                        //     }
-                        // }
-                        // else {
-                        //     contador1++;
-                        //     var hora = moment(`1990-01-01 00:00:00`).format("HH:mm:ss")
-                        //     auxPrueba.push(hora)
-                        // }
-
+                        const getMarcacion2 = await ASIS.find({ "$and": [{ id_bio: empleado[a].id_bio }, { fecha: unDiaMenos }] })
                         //--------------SI EXISTE MARCACIONES DIA ACTUAL O DIA ANTES---------------------------
                         if (getMarcacion.length > 0 || getMarcacion2.length > 0) {
                             //----CALCULOS DE MARCACION DIA ANTES----
@@ -904,52 +674,44 @@ router.get('/sueldo/:id', async (req, res) => {
                                     if (n > ingreNoc) {
                                         auxPrueba.push(getMarcacion2[m].hora)
                                     }
-                                    // else { 
-                                    //     var hora = moment(`1990-01-01 00:00:00`).format("HH:mm:ss")
-                                    //     auxPrueba[0]=hora 
-                                    // }
                                 }
                             }
-                            // else {
-                            //     var hora = moment(`1990-01-01 00:00:00`).format("HH:mm:ss")
-                            //     auxPrueba.push(hora)
-                            // }
                             //--------------SI EXISTE MARCACIONES DIA ACTUAL------------------
                             const num = getMarcacion.length
                             // const buscarFeriado
                             for (var j = 0; j < num; j++) {
                                 var n = moment(`1990-01-01 ${getMarcacion[j].hora}`).format("HH:mm:ss")
-                                // console.log(n)
-                                // console.log(salidaNoc)
                                 if (n < salidaNoc) {
-                                    // console.log('si')
                                     auxPrueba.push(getMarcacion[j].hora)
-                                    // console.log(auxPrueba)
                                 }
                             }
-                            //SI EXISTEN MARCACIONES SIGUIDAS CON MENOS DE 15 MIN
-                            for (var k = 0; k < auxPrueba.length; k++) {
-                                if (auxPrueba.length > k + 1) {
-                                    var hora1 = moment(`1990-01-01 ${auxPrueba[k]}`).add(15, 'm').format("HH:mm:ss")
-                                    var hora2 = moment(`1990-01-01 ${auxPrueba[k + 1]}`).format("HH:mm:ss")
-                                    if (hora2 < hora1) {
-                                        auxPrueba2.push(auxPrueba[k])
-                                        auxPrueba.splice(k + 1, 1)
-                                    }
-                                    else { auxPrueba2.push(auxPrueba[k]) }
-                                } else {
-                                    var hora = moment(`1990-01-01 ${auxPrueba[k]}`).format("HH:mm:ss")
-                                    auxPrueba2.push(hora)
-                                }
-                            }
+                            // console.log(auxPrueba)
+                            //----------SI EXISTEN MARCACIONES SIGUIDAS CON MENOS DE 15 MIN-----
+                            // for (var k = 0; k < auxPrueba.length; k++) {
+                            //     if (auxPrueba.length > k + 1) {
+                            //         var hora1 = moment(`1990-01-01 ${auxPrueba[k]}`).add(15, 'm').format("HH:mm:ss")
+                            //         var hora2 = moment(`1990-01-01 ${auxPrueba[k + 1]}`).format("HH:mm:ss")
+                            //         if (hora2 < hora1) {
+                            //             auxPrueba2.push(auxPrueba[k])
+                            //             auxPrueba.splice(k + 1, 1)
+                            //         }
+                            //         else { auxPrueba2.push(auxPrueba[k]) }
+                            //     } else {
+                            //         var hora = moment(`1990-01-01 ${auxPrueba[k]}`).format("HH:mm:ss")
+                            //         auxPrueba2.push(hora)
+                            //     }
+                            // }
+                            // console.log(auxPrueba2)
                             //----------------ATRASOS NOCTURNOS--------------------------
                             const atrasoNoc = (a) => {
                                 // var data=moment()
-                                var sum = moment(`1990-01-01 ${a}`).format("HH:mm:ss")
-                                if (toleranciaNoc < sum) {
+                                var data = moment(`1990-01-01 ${a}`)
+                                var data2 = moment(`1990-01-01 ${toleranciaNoc}`).format("HH:mm:ss")
+                                if (data2 < data) {
+                                    data2 = moment(data2).format("HH:mm:ss")
                                     var aux = toleranciaNoc.split(":")
-                                    sum = moment(sum).subtract(parseInt(aux[0]), 'h').subtract(parseInt(aux[1]), 'm').format("HH:mm:ss")
-                                    return sum
+                                    data = moment(data).subtract(parseInt(aux[0]), 'h').subtract(parseInt(aux[1]), 'm').format("HH:mm:ss")
+                                    return data
                                 } else return moment(`1990-01-01 00:00:00`).format("HH:mm:ss")
                             }
                             //----------------HORAS EXTRA NOCTURNOS--------------------------
@@ -965,66 +727,93 @@ router.get('/sueldo/:id', async (req, res) => {
                                 else return moment(`1990-01-01 00:00:00`).format("HH:mm:ss")
 
                             }
+                            //--------------HORAS DE TRABAJO---------------------
+                            const horasTrabajo = (a, b) => {
+                                if (a != undefined && b != undefined) {
+                                    var data1 = moment(`1990-01-01 ${a}`)
+                                    var data2 = moment(`1990-01-02 ${b}`)
+                                    var duration = moment.duration(data2.diff(data1)).asHours()
+                                    var result = 0;
+                                    if (duration > 7) {
+                                        result = 0
+                                    } else { result = 0.5 }
+                                    return { duration, result }
+                                } else if (a != undefined || b != undefined) {
+                                    var duration = 0
+                                    var result = 0.5
+                                    return { duration, result }
+                                }
+                            }
                             //--------------PRUEBAS MARCACIONES--------------------------
-                            const numAux = auxPrueba2.length
-                            if (auxPrueba2.length > 0) {
+                            const numAux = auxPrueba.length
+                            if (auxPrueba.length > 0) {
                                 if (numAux == 1) {
+                                    const { duration, result } = horasTrabajo(auxPrueba[0])
                                     //NO ENTRO DIA ANTES PERO SI AL DIAL ACTUAL
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
                                         ingreso1: '00:00:00',
-                                        salida1: auxPrueba2[0],
+                                        salida1: auxPrueba[0],
                                         ingreso2: '00:00:00',
                                         salida2: '00:00:00',
                                         atraso: '00:00:00',
-                                        horasExtra: horasExtraNoc(auxPrueba2[0]),
+                                        horasExtra: horasExtraNoc(auxPrueba[0]),
                                         diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: 'verificar marcación'
+                                        horasDeTrabajo: duration.toFixed(2),
+                                        faltas: result.toFixed(2),
+                                        observaciones: 'verificar marcación',
+                                        observaciones2: "",
                                     })
                                 }
                                 else if (numAux == 2) {
                                     //ENTRÓ AL DIA ANTES Y TAMBIEN AL DIA ACTUAL
+                                    const { duration, result } = horasTrabajo(auxPrueba[0], auxPrueba[1])
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
-                                        ingreso1: auxPrueba2[0],
-                                        salida1: auxPrueba2[1],
+                                        ingreso1: auxPrueba[0],
+                                        salida1: auxPrueba[1],
                                         ingreso2: '00:00:00',
                                         salida2: '00:00:00',
-                                        atraso: atrasoNoc(auxPrueba2[0]),
-                                        horasExtra: horasExtraNoc(auxPrueba2[1]),
+                                        atraso: atrasoNoc(auxPrueba[0]),
+                                        horasExtra: horasExtraNoc(auxPrueba[1]),
                                         diaTrabajado: '1.0',
-                                        faltas: '0.0',
-                                        observaciones: ''
+                                        horasDeTrabajo: duration.toFixed(2),
+                                        faltas: result.toFixed(2),
+                                        observaciones: '',
+                                        observaciones2: "",
                                     })
 
                                 } else if (numAux == 0) {
                                     //NO ENTRA AL ACRTUAL NI AL DIA ANTES
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
                                         dia: nameDay,
                                         ingreso1: "00:00:00",
                                         salida1: "00:00:00",
                                         ingreso2: '00:00:00',
                                         salida2: '00:00:00',
-                                        // atraso: atraso(auxPrueba2[0]),
-                                        // horasExtra: horasExtra(aux[0].hora),
+                                        atraso: "00:00:00",
+                                        horasExtra: "00:00:00",
                                         diaTrabajado: '0.0',
+                                        horasDeTrabajo: "0:00",
                                         faltas: '1.0',
-                                        observaciones: 'Falta'
+                                        observaciones: 'Falta',
+                                        observaciones2: "",
                                     })
                                 }
                                 buscarFechaAux = moment(buscarFechaAux).add(1, 'day').format('YYYY-MM-DD')
                             } else {
                                 //ENTRA A GET_MARCACIONES Y GET_MARCACIONES2 PERO NO PUSHEA NUNGUNA MARCACION
                                 var suma = 0;
-                                var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
-                                var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
+                                var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: empleado[a].id_bio }, { fechaPermisoIni: buscarFechaAux }] })
+                                var buscarVacacion = await VACACION.find({ '$and': [{ id_bio: empleado[a].id_bio }, { fechaVacacionIni: buscarFechaAux }] })
+                                //---NOCTURNOS NO TIENEN FERIADO---------
+                                // var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
                                 if (buscarPermiso.length > 0) {
                                     var diaPermiso = nameDay
                                     var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
@@ -1032,7 +821,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                     if (hasta <= buscarFechaFin) {
                                         while (desde.isSameOrBefore(hasta)) {
                                             auxPrueba3.push({
-                                                id_bio: params,
+                                                id_bio: empleado[a].id_bio,
                                                 dia: diaPermiso,
                                                 fecha: moment(desde).format("YYYY-MM-DD"),
                                                 ingreso1: '00:00:00',
@@ -1041,10 +830,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                                 salida2: '00:00:00',
                                                 atraso: '00:00:00',
                                                 horasExtra: '00:00:00',
-                                                horasTrabajo: '00:00:00',
+                                                horasDeTrabajo: "0:00",
                                                 diaTrabajado: '1.0',
                                                 faltas: '0.0',
-                                                observaciones: buscarPermiso[0].namePermiso
+                                                observaciones: buscarPermiso[0].namePermiso,
+                                                observaciones2: "Permiso",
                                             })
                                             desde = moment(desde).add(1, 'day')
                                             diaPermiso = moment(desde).locale('es').format('dddd')
@@ -1055,7 +845,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                     } else if (hasta >= buscarFechaFinAux) {
                                         while (desde.isSameOrBefore(buscarFechaFinAux)) {
                                             auxPrueba3.push({
-                                                id_bio: params,
+                                                id_bio: empleado[a].id_bio,
                                                 dia: diaPermiso,
                                                 fecha: moment(desde).format('YYYY-MM-DD'),
                                                 ingreso1: '00:00:00',
@@ -1064,10 +854,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                                 salida2: '00:00:00',
                                                 atraso: '00:00:00',
                                                 horasExtra: '00:00:00',
-                                                horasTrabajo: '00:00:00',
+                                                horasDeTrabajo: "0:00",
                                                 diaTrabajado: '1.0',
                                                 faltas: '0.0',
-                                                observaciones: buscarPermiso[0].namePermiso
+                                                observaciones: buscarPermiso[0].namePermiso,
+                                                observaciones2: "Permiso",
                                             })
                                             desde = moment(desde).add(1, 'day')
                                             diaPermiso = moment(desde).locale('es').format('dddd')
@@ -1077,39 +868,39 @@ router.get('/sueldo/:id', async (req, res) => {
                                         i--;
                                     }
                                 }
-                                else if (buscarFeriado.length > 0) {
-                                    // console.log('entra a feriado')
-                                    var diaFeriado = nameDay
-                                    var desde = moment(buscarFeriado[0].fechaFeriadoIni, 'YYYY-MM-DD')
-                                    var hasta = moment(buscarFeriado[0].fechaFeriadoFin, 'YYYY-MM-DD')
+                                else if (buscarPermiso.length > 0) {
+                                    var diaVacacion = nameDay
+                                    var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                    var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
                                     if (hasta <= buscarFechaFin) {
                                         while (desde.isSameOrBefore(hasta)) {
                                             auxPrueba3.push({
-                                                id_bio: params,
-                                                dia: diaFeriado,
-                                                fecha: moment(desde).format('YYYY-MM-DD'),
+                                                id_bio: empleado[a].id_bio,
+                                                dia: diaVacacion,
+                                                fecha: moment(desde).format("YYYY-MM-DD"),
                                                 ingreso1: '00:00:00',
                                                 salida1: '00:00:00',
                                                 ingreso2: '00:00:00',
                                                 salida2: '00:00:00',
                                                 atraso: '00:00:00',
                                                 horasExtra: '00:00:00',
-                                                horasTrabajo: '00:00:00',
+                                                horasDeTrabajo: "0:00",
                                                 diaTrabajado: '1.0',
                                                 faltas: '0.0',
-                                                observaciones: buscarFeriado[0].nameFeriado
+                                                observaciones: buscarVacacion[0].nameVacaciones,
+                                                observaciones2: "Permiso",
                                             })
                                             desde = moment(desde).add(1, 'day')
-                                            diaFeriado = moment(desde).locale('es').format('dddd')
+                                            diaVacacion = moment(desde).locale('es').format('dddd')
                                             suma++
                                         }
-                                        i = i + suma;
-                                        i--;
+                                        i = i + suma
+                                        i--
                                     } else if (hasta >= buscarFechaFinAux) {
                                         while (desde.isSameOrBefore(buscarFechaFinAux)) {
                                             auxPrueba3.push({
-                                                id_bio: params,
-                                                dia: diaFeriado,
+                                                id_bio: empleado[a].id_bio,
+                                                dia: diaVacacion,
                                                 fecha: moment(desde).format('YYYY-MM-DD'),
                                                 ingreso1: '00:00:00',
                                                 salida1: '00:00:00',
@@ -1117,21 +908,77 @@ router.get('/sueldo/:id', async (req, res) => {
                                                 salida2: '00:00:00',
                                                 atraso: '00:00:00',
                                                 horasExtra: '00:00:00',
-                                                horasTrabajo: '00:00:00',
+                                                horasDeTrabajo: "0:00",
                                                 diaTrabajado: '1.0',
                                                 faltas: '0.0',
-                                                observaciones: buscarFeriado[0].nameFeriado
+                                                observaciones: buscarVacacion[0].nameVacaciones,
+                                                observaciones2: "Permiso",
                                             })
                                             desde = moment(desde).add(1, 'day')
-                                            diaFeriado = moment(desde).locale('es').format('dddd')
-                                            suma++
+                                            diaVacacion = moment(desde).locale('es').format('dddd')
+                                            suma++;
                                         }
                                         i = i + suma;
                                         i--;
                                     }
-                                } else {
+                                }
+                                //-----NOCTURNOS NO TIENEN FERIADO-------------
+                                // else if (buscarFeriado.length > 0) {
+                                //     // console.log('entra a feriado')
+                                //     var diaFeriado = nameDay
+                                //     var desde = moment(buscarFeriado[0].fechaFeriadoIni, 'YYYY-MM-DD')
+                                //     var hasta = moment(buscarFeriado[0].fechaFeriadoFin, 'YYYY-MM-DD')
+                                //     if (hasta <= buscarFechaFin) {
+                                //         while (desde.isSameOrBefore(hasta)) {
+                                //             auxPrueba3.push({
+                                //                 id_bio: params,
+                                //                 dia: diaFeriado,
+                                //                 fecha: moment(desde).format('YYYY-MM-DD'),
+                                //                 ingreso1: '00:00:00',
+                                //                 salida1: '00:00:00',
+                                //                 ingreso2: '00:00:00',
+                                //                 salida2: '00:00:00',
+                                //                 atraso: '00:00:00',
+                                //                 horasExtra: '00:00:00',
+                                //                 horasDeTrabajo: "0:00",
+                                //                 diaTrabajado: '1.0',
+                                //                 faltas: '0.0',
+                                //                 observaciones: buscarFeriado[0].nameFeriado
+                                //             })
+                                //             desde = moment(desde).add(1, 'day')
+                                //             diaFeriado = moment(desde).locale('es').format('dddd')
+                                //             suma++
+                                //         }
+                                //         i = i + suma;
+                                //         i--;
+                                //     } else if (hasta >= buscarFechaFinAux) {
+                                //         while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                //             auxPrueba3.push({
+                                //                 id_bio: params,
+                                //                 dia: diaFeriado,
+                                //                 fecha: moment(desde).format('YYYY-MM-DD'),
+                                //                 ingreso1: '00:00:00',
+                                //                 salida1: '00:00:00',
+                                //                 ingreso2: '00:00:00',
+                                //                 salida2: '00:00:00',
+                                //                 atraso: '00:00:00',
+                                //                 horasExtra: '00:00:00',
+                                //                 horasDeTrabajo: "0:00",
+                                //                 diaTrabajado: '1.0',
+                                //                 faltas: '0.0',
+                                //                 observaciones: buscarFeriado[0].nameFeriado
+                                //             })
+                                //             desde = moment(desde).add(1, 'day')
+                                //             diaFeriado = moment(desde).locale('es').format('dddd')
+                                //             suma++
+                                //         }
+                                //         i = i + suma;
+                                //         i--;
+                                //     }
+                                // } 
+                                else {
                                     auxPrueba3.push({
-                                        id_bio: params,
+                                        id_bio: empleado[a].id_bio,
                                         dia: nameDay,
                                         fecha: buscarFechaAux,
                                         ingreso1: '00:00:00',
@@ -1140,20 +987,22 @@ router.get('/sueldo/:id', async (req, res) => {
                                         salida2: '00:00:00',
                                         atraso: '00:00:00',
                                         horasExtra: '00:00:00',
-                                        horasTrabajo: '00:00:00',
+                                        horasDeTrabajo: "0:00",
                                         diaTrabajado: '0.0',
                                         faltas: '1.0',
-                                        observaciones: 'Falta'
+                                        observaciones: 'Falta',
+                                        observaciones2: "",
                                     })
                                     suma++;
                                 }
                                 buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
                             }
                         } else {
-                            //---SI NO EXISTE MARCACION DIAL ACTUAL NI DIA ANTES--------------
+                            //---SI NO EXISTE MARCACION DIA ACTUAL NI DIA ANTES--------------
                             var suma = 0;
-                            var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
+                            var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: empleado[a].id_bio }, { fechaPermisoIni: buscarFechaAux }] })
                             var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
+                            var buscarVacacion = await VACACION.find({ "$and": [{ id_bio: empleado[a].id_bio }, { fechaVacacionIni: buscarFechaAux }] })
                             if (buscarPermiso.length > 0) {
                                 var diaPermiso = nameDay
                                 var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
@@ -1161,7 +1010,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaPermiso,
                                             fecha: moment(desde).format("YYYY-MM-DD"),
                                             ingreso1: '00:00:00',
@@ -1170,10 +1019,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
@@ -1184,7 +1034,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaPermiso,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -1193,10 +1043,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarPermiso[0].namePermiso
+                                            observaciones: buscarPermiso[0].namePermiso,
+                                            observaciones2: "Permiso",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaPermiso = moment(desde).locale('es').format('dddd')
@@ -1204,6 +1055,60 @@ router.get('/sueldo/:id', async (req, res) => {
                                     }
                                     i = i + suma;
                                     i--;
+                                }
+                            }
+                            else if (buscarVacacion.length > 0) {
+                                var diaVacacion = nameDay
+                                var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
+                                var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
+                                if (hasta <= buscarFechaFin) {
+                                    while (desde.isSameOrBefore(hasta)) {
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format("YYYY-MM-DD"),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++
+                                    }
+                                    i = i + suma;
+                                    i--;
+                                } else if (hasta >= buscarFechaFinAux) {
+                                    while (desde.isSameOrBefore(buscarFechaFinAux)) {
+                                        auxPrueba3.push({
+                                            id_bio: empleado[a].id_bio,
+                                            dia: diaVacacion,
+                                            fecha: moment(desde).format('YYYY-MM-DD'),
+                                            ingreso1: '00:00:00',
+                                            salida1: '00:00:00',
+                                            ingreso2: '00:00:00',
+                                            salida2: '00:00:00',
+                                            atraso: '00:00:00',
+                                            horasExtra: '00:00:00',
+                                            horasDeTrabajo: "0:00",
+                                            diaTrabajado: '1.0',
+                                            faltas: '0.0',
+                                            observaciones: buscarVacacion[0].nameVacaciones,
+                                            observaciones2: "Vacaciones",
+                                        })
+                                        desde = moment(desde).add(1, 'day')
+                                        diaVacacion = moment(desde).locale('es').format('dddd')
+                                        suma++;
+                                    }
+                                    i = i + suma;
+                                    i--
                                 }
                             }
                             else if (buscarFeriado.length > 0) {
@@ -1214,7 +1119,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -1223,10 +1128,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -1237,7 +1143,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -1246,10 +1152,11 @@ router.get('/sueldo/:id', async (req, res) => {
                                             salida2: '00:00:00',
                                             atraso: '00:00:00',
                                             horasExtra: '00:00:00',
-                                            horasTrabajo: '00:00:00',
+                                            horasDeTrabajo: "0:00",
                                             diaTrabajado: '1.0',
                                             faltas: '0.0',
-                                            observaciones: buscarFeriado[0].nameFeriado
+                                            observaciones: buscarFeriado[0].nameFeriado,
+                                            observaciones2: "Feriado",
                                         })
                                         desde = moment(desde).add(1, 'day')
                                         diaFeriado = moment(desde).locale('es').format('dddd')
@@ -1260,7 +1167,7 @@ router.get('/sueldo/:id', async (req, res) => {
                                 }
                             } else {
                                 auxPrueba3.push({
-                                    id_bio: params,
+                                    id_bio: empleado[a].id_bio,
                                     dia: nameDay,
                                     fecha: buscarFechaAux,
                                     ingreso1: '00:00:00',
@@ -1269,48 +1176,49 @@ router.get('/sueldo/:id', async (req, res) => {
                                     salida2: '00:00:00',
                                     atraso: '00:00:00',
                                     horasExtra: '00:00:00',
-                                    horasTrabajo: '00:00:00',
+                                    horasDeTrabajo: "0:00",
                                     diaTrabajado: '0.0',
                                     faltas: '1.0',
-                                    observaciones: 'Falta'
+                                    observaciones: 'Falta',
+                                    observaciones2: "",
                                 })
                                 suma++;
                             }
                             buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
                         }
-                    } else {
+                    }
+                    else {
                         //---SI NO ESTA PROGRAMADO CON LOS CODIGO DE DIAS---
                         buscarFechaAux = moment(buscarFechaAux).add(1, 'day').format('YYYY-MM-DD')
                     }
+
                 } else {
                     //----SI NO ESTA DENTRO DEL PARAMETRO FECHAS DE CONTRATO
                     buscarFechaAux = moment(buscarFechaAux).add(1, 'day').format('YYYY-MM-DD')
                 }
-                // const contArray=array.length
-                // for(var i=0;i<contArray;i++){
-                //     const existe=await KARDEXASISTENCIA.find({"$and":[{id_bio:array[i].id_bio},{fecha:array[i].fecha}]}).countDocuments()
-                //     if(existe==0){
-                //         const kardexAsistencia=new KARDEXASISTENCIA(array[i])
-                //         kardexAsistencia.save()
-                //     }else{
-                //         await KARDEXASISTENCIA.deleteOne({fecha:array[i].fecha})
-                //         const kardexAsistencia= new KARDEXASISTENCIA(array[i])
-                //         kardexAsistencia.save()
-                //     }
-                // }
-
-                // console.log(array)
             }
         }
-        console.log(auxPrueba3)
-        res.status(200).json(array)
-    } else {
-        console.log('empleado no existe')
+
+        // console.log(auxPrueba3)
+        //---------REGISTRAR TODAS LAS MARCACIONES---------------
+        const contPrueba3 = auxPrueba3.length
+        for (var b = 0; b < contPrueba3; b++) {
+            const existe = await KARDEXASISTENCIA.find({ "$and": [{ id_bio: auxPrueba3[b].id_bio }, { fecha: auxPrueba3[b].fecha }] })
+            if (existe.length == 0) {
+                const kardexAsistencia = new KARDEXASISTENCIA(auxPrueba3[b])
+                kardexAsistencia.save()
+            } else {
+                await KARDEXASISTENCIA.deleteMany({ "$and": [{ id_bio: auxPrueba3[b].id_bio }, { fecha: auxPrueba3[b].fecha }] })
+                const kardexAsistencia = new KARDEXASISTENCIA(auxPrueba3[b])
+                kardexAsistencia.save()
+            }
+        }
+        // console.log('se registro')
     }
-
-    // console.log(empleado)
-
+    res.status(200).json({message:'toda informacion registrada'})
 })
+
+
 
 //----------------------PLANILLA KARDEX ASISTENCIA 2------------------------
 router.get("/nuevoTodo/:id", async (req, res) => {
@@ -1393,6 +1301,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
         var auxPrueba3 = []
 
         //------------HORARIO CONTINUO----------------------------
+        //------------HORARIO DIURNO----------------------------
         if (empleado[0].cod_estH === '1') {
             for (var i = 0; i < contDias; i++) {
                 if (empleado[0].fechaini <= buscarFechaAux && empleado[0].fechafin >= buscarFechaAux) {
@@ -1463,8 +1372,8 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i--;
                                 }
                                 buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
-                            } 
-                            else if(buscarVacacion.length>0){
+                            }
+                            else if (buscarVacacion.length > 0) {
                                 var diaVacacion = nameDay
                                 var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
                                 var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
@@ -1742,7 +1651,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                             var suma = 0;
                             var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
                             var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
-                            var buscarVacacion= await VACACION.find({"$and":[{id_bio:params},{fechaVacacionIni:buscarFechaAux}] })
+                            var buscarVacacion = await VACACION.find({ "$and": [{ id_bio: params }, { fechaVacacionIni: buscarFechaAux }] })
                             if (buscarPermiso != 0) {
                                 var diaPermiso = nameDay
                                 var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
@@ -1797,7 +1706,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i--
                                 }
                             }
-                            else if(buscarVacacion.length>0){
+                            else if (buscarVacacion.length > 0) {
                                 var diaVacacion = nameDay
                                 var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
                                 var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
@@ -2288,7 +2197,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                             var suma = 0;
                             var buscarPermiso = await PERMISO.find({ '$and': [{ id_bio: params }, { fechaPermisoIni: buscarFechaAux }] })
                             var buscarFeriado = await FERIADO.find({ fechaFeriadoIni: buscarFechaAux }).sort({ nameFeriado: 1 })
-                            var buscarVacacion= await VACACION.find({"$and":[{id_bio:params},{fechaVacacionIni:buscarFechaAux}] })
+                            var buscarVacacion = await VACACION.find({ "$and": [{ id_bio: params }, { fechaVacacionIni: buscarFechaAux }] })
                             if (buscarPermiso.length > 0) {
                                 var diaPermiso = nameDay
                                 var desde = moment(buscarPermiso[0].fechaPermisoIni, "YYYY-MM-DD")
@@ -2343,7 +2252,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i--;
                                 }
                             }
-                            else if(buscarVacacion.length>0){
+                            else if (buscarVacacion.length > 0) {
                                 var diaVacacion = nameDay
                                 var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
                                 var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")

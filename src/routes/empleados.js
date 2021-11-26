@@ -3,14 +3,12 @@ const router = express.Router()
 const EMPLE = require('../models/Empleado')
 const CARGO = require('../models/Cargo')
 const HORARIO = require('../models/Horario')
-const multer = require('multer')
-const path = require('path')
-const fs = require('fs').promises
-
+const moment=require('moment')
 const cloudinary = require('../utils/cloudinary')
 const upload = require('../utils/multer')
 const MOVIMIENTO = require('../models/reportes/MovimientoPersonal')
 const ALTASYBAJAS = require('../models/reportes/AltasBajasPersonal')
+const SERVICE = require('../models/reportes/YearsSevice')
 
 
 router.post('/empleado', upload.single('image'), async (req, res) => {
@@ -18,6 +16,23 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
     const horario = await HORARIO.find()
     const aux = horario.length
     try {
+        var numero = 1;
+        if (params.typeContrato === 'eventual') {
+            // console.log('entra')
+            numero = 0
+            numero = numero.toString()
+        } else {
+            while (true) {
+                numero = numero.toString()
+                const numItem = await EMPLE.find({ "$and": [{ estadoEmp: 'activo' }, { typeContrato: 'permanente' }, { itemEmp: numero }] })
+                if (numItem.length > 0) {
+                    numero = parseInt(numero)
+                    numero++;
+                }
+                else break;
+            }
+        }
+
         for (var i = 0; i < aux; i++) {
             if (params.typeHorario === horario[i].descripcion) {
                 if (req.file) {
@@ -25,7 +40,8 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
                     const result = await cloudinary.uploader.upload(req.file.path)
                     const empleado = new EMPLE({
                         id_bio: params.id_bio,
-                        itemEmp: params.itemEmp,
+                        // itemEmp: params.itemEmp,
+                        itemEmp: numero,
                         lastNameEmpP: params.lastNameEmpP,
                         lastNameEmpM: params.lastNameEmpM,
                         firstNameEmp: params.firstNameEmp,
@@ -82,6 +98,7 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
                     await empleado.save().then(() => {
                         res.status(200).json({ message: 'empleado registrado' })
                     })
+                    //REGISTRO DE ALTAS Y BAJAS
                     var fecha = new Date()
                     const altaybaja = new ALTASYBAJAS({
                         id_bio: params.id_bio,
@@ -92,11 +109,16 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
                         fechaAltasBajas: fecha.toLocaleDateString(),
                     })
                     altaybaja.save()
+                    //REGISTRO AÑOS DE SERVICIO
+                    const servicio = new SERVICE(params)
+                    servicio.save()
+
                 } else {
                     //----NO EXISTE IMAGEN----
                     const empleado = new EMPLE({
                         id_bio: params.id_bio,
-                        itemEmp: params.itemEmp,
+                        // itemEmp: params.itemEmp,
+                        itemEmp: numero,
                         lastNameEmpP: params.lastNameEmpP,
                         lastNameEmpM: params.lastNameEmpM,
                         firstNameEmp: params.firstNameEmp,
@@ -155,6 +177,9 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
                         fechaAltasBajas: fecha.toLocaleDateString(),
                     })
                     altaybaja.save()
+                    //REGISTRO AÑOS DE SERVICIO
+                    const servicio = new SERVICE(params)
+                    servicio.save()
                 }
                 break;
             }
@@ -205,6 +230,56 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
     // console.log(empleado_bio[0].typeHorario)
 
     try {
+        //--NUMERO ITEM AUTOMATICO--
+        var numero = 1;
+        if (params.typeContrato != empleado_bio[0].typeContrato) {
+            if (params.typeContrato === 'permanente' && params.estadoEmp === 'activo') {
+                while (true) {
+                    numero = numero.toString()
+                    const numItem = await EMPLE.find({ "$and": [{ estadoEmp: 'activo' }, { typeContrato: 'permanente' }, { itemEmp: numero }] })
+                    if (numItem.length > 0) {
+                        numero = parseInt(numero)
+                        numero++;
+                    }
+                    else break;
+                }
+            } else {
+                numero = 0
+                numero = numero.toString()
+            }
+        } else if (params.estadoEmp != empleado_bio[0].estadoEmp) {
+            if (params.estadoEmp === 'activo') {
+                while (true) {
+                    numero = numero.toString()
+                    const numItem = await EMPLE.find({ "$and": [{ estadoEmp: 'activo' }, { typeContrato: 'permanente' }, { itemEmp: numero }] })
+                    if (numItem.length > 0) {
+                        numero = parseInt(numero)
+                        numero++;
+                    }
+                    else break;
+                }
+            } else {
+                numero = 0
+                numero = numero.toString()
+            }
+        } else {
+            numero = empleado_bio[0].itemEmp
+        }
+        //ANTIGUDAD---------
+        if (params.typeAntiguedad != empleado_bio[0].typeAntiguedad) {
+            var fechaCambio=new Date()
+            fechaCambio=moment(fechaCambio).format("YYYY-MM-DD")
+            const service = new SERVICE({
+                id_bio: params.id_bio,
+                firstNameEmp: params.firstNameEmp,
+                lastNameEmpP: params.lastNameEmpP,
+                lastNameEmpM: params.lastNameEmpM,
+                typeAntiguedad: params.typeAntiguedad,
+                fechaini: fechaCambio,
+            })
+            service.save()
+        }
+        //----------------------------------------------------
         if (params.typeHorario === empleado_bio[0].typeHorario && params.cargoEmp === empleado_bio[0].cargoEmp) {
             //si no se cambian el horario y el cargo
             console.log('entra al primero')
@@ -216,7 +291,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                     const result = await cloudinary.uploader.upload(req.file.path)
                     await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                         id_bio: params.id_bio,
-                        itemEmp: params.itemEmp,
+                        // itemEmp: params.itemEmp,
+                        itemEmp: numero,
                         lastNameEmpP: params.lastNameEmpP,
                         lastNameEmpM: params.lastNameEmpM,
                         firstNameEmp: params.firstNameEmp,
@@ -260,7 +336,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                     const result = await cloudinary.uploader.upload(req.file.path)
                     await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                         id_bio: params.id_bio,
-                        itemEmp: params.itemEmp,
+                        // itemEmp: params.itemEmp,
+                        itemEmp: numero,
                         lastNameEmpP: params.lastNameEmpP,
                         lastNameEmpM: params.lastNameEmpM,
                         firstNameEmp: params.firstNameEmp,
@@ -303,7 +380,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                 //---NO EXISTE IMAGEN----
                 await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                     id_bio: params.id_bio,
-                    itemEmp: params.itemEmp,
+                    // itemEmp: params.itemEmp,
+                    itemEmp: numero,
                     lastNameEmpP: params.lastNameEmpP,
                     lastNameEmpM: params.lastNameEmpM,
                     firstNameEmp: params.firstNameEmp,
@@ -363,7 +441,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                             const result = await cloudinary.uploader.upload(req.file.path)
                             await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                                 id_bio: params.id_bio,
-                                itemEmp: params.itemEmp,
+                                // itemEmp: params.itemEmp,
+                                itemEmp: numero,
                                 lastNameEmpP: params.lastNameEmpP,
                                 lastNameEmpM: params.lastNameEmpM,
                                 firstNameEmp: params.firstNameEmp,
@@ -414,7 +493,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                             const result = await cloudinary.uploader.upload(req.file.path)
                             await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                                 id_bio: params.id_bio,
-                                itemEmp: params.itemEmp,
+                                // itemEmp: params.itemEmp,
+                                itemEmp: numero,
                                 lastNameEmpP: params.lastNameEmpP,
                                 lastNameEmpM: params.lastNameEmpM,
                                 firstNameEmp: params.firstNameEmp,
@@ -465,7 +545,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                     } else {
                         await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                             id_bio: params.id_bio,
-                            itemEmp: params.itemEmp,
+                            // itemEmp: params.itemEmp,
+                            itemEmp: numero,
                             lastNameEmpP: params.lastNameEmpP,
                             lastNameEmpM: params.lastNameEmpM,
                             firstNameEmp: params.firstNameEmp,
@@ -540,7 +621,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                             const result = await cloudinary.uploader.upload(req.file.path)
                             await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                                 id_bio: params.id_bio,
-                                itemEmp: params.itemEmp,
+                                // itemEmp: params.itemEmp,
+                                itemEmp: numero,
                                 lastNameEmpP: params.lastNameEmpP,
                                 lastNameEmpM: params.lastNameEmpM,
                                 firstNameEmp: params.firstNameEmp,
@@ -584,7 +666,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                             var fecha = new Date()
                             const movimientoPersonal = new MOVIMIENTO({
                                 id_bio: params.id_bio,
-                                itemEmp: params.itemEmp,
+                                // itemEmp: params.itemEmp,
+                                itemEmp: numero,
                                 firstNameEmp: params.firstNameEmp,
                                 lastNameEmpP: params.lastNameEmpP,
                                 lastNameEmpM: params.lastNameEmpM,
@@ -598,7 +681,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                             const result = await cloudinary.uploader.upload(req.file.path)
                             await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                                 id_bio: params.id_bio,
-                                itemEmp: params.itemEmp,
+                                // itemEmp: params.itemEmp,
+                                itemEmp: numero,
                                 lastNameEmpP: params.lastNameEmpP,
                                 lastNameEmpM: params.lastNameEmpM,
                                 firstNameEmp: params.firstNameEmp,
@@ -642,7 +726,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                             var fecha = new Date()
                             const movimientoPersonal = new MOVIMIENTO({
                                 id_bio: params.id_bio,
-                                itemEmp: params.itemEmp,
+                                // itemEmp: params.itemEmp,
+                                itemEmp: numero,
                                 firstNameEmp: params.firstNameEmp,
                                 lastNameEmpP: params.lastNameEmpP,
                                 lastNameEmpM: params.lastNameEmpM,
@@ -657,7 +742,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                     } else {
                         await EMPLE.findByIdAndUpdate({ _id: req.params.id }, {
                             id_bio: params.id_bio,
-                            itemEmp: params.itemEmp,
+                            // itemEmp: params.itemEmp,
+                            itemEmp: numero,
                             lastNameEmpP: params.lastNameEmpP,
                             lastNameEmpM: params.lastNameEmpM,
                             firstNameEmp: params.firstNameEmp,
@@ -708,7 +794,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
                         var fecha = new Date()
                         const movimientoPersonal = new MOVIMIENTO({
                             id_bio: params.id_bio,
-                            itemEmp: params.itemEmp,
+                            // itemEmp: params.itemEmp,
+                            itemEmp: numero,
                             firstNameEmp: params.firstNameEmp,
                             lastNameEmpP: params.lastNameEmpP,
                             lastNameEmpM: params.lastNameEmpM,
