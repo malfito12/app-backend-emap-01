@@ -36,6 +36,7 @@ app.use('/api', require('./routes/routesPlanillas/planillaSueldo'))
 app.use('/api', require('./routes/routesPlanillas/kardexAsistencia'))
 app.use('/api', require('./routes/routesPlanillas/planillaRefrigerio'))
 app.use('/api', require('./routes/routesPlanillas/planillaRetrospectiva'))
+app.use('/api', require('./routes/routesPlanillas/planillaAportesPatronales'))
 
 //Reportes
 app.use('/api', require('./routes/reportes/movimientoPersonal'))

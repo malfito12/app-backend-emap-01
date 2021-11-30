@@ -102,9 +102,10 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
                     var fecha = new Date()
                     const altaybaja = new ALTASYBAJAS({
                         id_bio: params.id_bio,
-                        firstNameEmp: params.firstNameEmp,
-                        lastNameEmpP: params.lastNameEmpP,
-                        lastNameEmpM: params.lastNameEmpM,
+                        fullName: params.firstNameEmp +" "+ params.lastNameEmpP+""+params.lastNameEmpM,
+                        // firstNameEmp: params.firstNameEmp,
+                        // lastNameEmpP: params.lastNameEmpP,
+                        // lastNameEmpM: params.lastNameEmpM,
                         estadoEmp: params.estadoEmp,
                         fechaAltasBajas: fecha.toLocaleDateString(),
                     })
@@ -170,9 +171,10 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
                     var fecha = new Date()
                     const altaybaja = new ALTASYBAJAS({
                         id_bio: params.id_bio,
-                        firstNameEmp: params.firstNameEmp,
-                        lastNameEmpP: params.lastNameEmpP,
-                        lastNameEmpM: params.lastNameEmpM,
+                        fullName: params.firstNameEmp +" "+ params.lastNameEmpP+""+params.lastNameEmpM,
+                        // firstNameEmp: params.firstNameEmp,
+                        // lastNameEmpP: params.lastNameEmpP,
+                        // lastNameEmpM: params.lastNameEmpM,
                         estadoEmp: params.estadoEmp,
                         fechaAltasBajas: fecha.toLocaleDateString(),
                     })
@@ -818,10 +820,12 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
             var fecha = new Date()
             const altaybaja = new ALTASYBAJAS({
                 id_bio: params.id_bio,
-                firstNameEmp: params.firstNameEmp,
-                lastNameEmpP: params.lastNameEmpP,
-                lastNameEmpM: params.lastNameEmpM,
+                fullName: params.firstNameEmp +" "+ params.lastNameEmpP+""+params.lastNameEmpM,
+                // firstNameEmp: params.firstNameEmp,
+                // lastNameEmpP: params.lastNameEmpP,
+                // lastNameEmpM: params.lastNameEmpM,
                 estadoEmp: params.estadoEmp,
+                motivoCambio:params.motivoCambio,
                 fechaAltasBajas: fecha.toLocaleDateString(),
             })
             altaybaja.save()

@@ -3,12 +3,16 @@ const CARGO = require('../models/Cargo')
 const router = express.Router()
 const DEPARTAMENT = require('../models/Departament')
 const EMPLEADO = require('../models/Empleado')
+const uuid = require('uuid')
 
 router.post('/departament', async (req, res) => {
     const params = req.body
+    const clave = uuid.v4()
+    const data = { ...params, idDepartament: clave }
     try {
-        const departament = new DEPARTAMENT(params)
-        departament.save(function (err) {
+        const departamento = new DEPARTAMENT(data)
+ 
+        departamento.save(function (err) {
             if (err) {
                 return res.status(400).send({
                     message: (err.name === 'MongoError' && err.code === 11000) ? 'el codigo ya existe' : 'es otro error'
@@ -34,10 +38,10 @@ router.get('/departament', async (req, res) => {
 router.put('/departament/:id', async (req, res) => {
     const params = req.body
     try {
-        const departament=await DEPARTAMENT.findById({_id:req.params.id})
-        await DEPARTAMENT.findByIdAndUpdate({_id:req.params.id},params)
-        await EMPLEADO.updateMany({departamentEmp:departament.nameDepartament},{$set:{departamentEmp:params.nameDepartament}})
-        await CARGO.updateMany({nameDepartament:departament.nameDepartament},{$set:{nameDepartament:params.nameDepartament}})
+        const departament = await DEPARTAMENT.findById({ _id: req.params.id })
+        await DEPARTAMENT.findByIdAndUpdate({ _id: req.params.id }, params)
+        await EMPLEADO.updateMany({ departamentEmp: departament.nameDepartament }, { $set: { departamentEmp: params.nameDepartament } })
+        await CARGO.updateMany({ nameDepartament: departament.nameDepartament }, { $set: { nameDepartament: params.nameDepartament } })
         // await DEPARTAMENT.findByIdAndUpdate({ _id: params }, {
         //     cod_dep: params.cod_dep,
         //     nameDepartament: params.nameDepartament

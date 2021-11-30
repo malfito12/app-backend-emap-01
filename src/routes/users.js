@@ -1,12 +1,15 @@
 const express = require('express')
 const router = express.Router()
 var crypto = require('crypto')
+const CryptoJS = require('crypto-js')
+const nodemailer = require('nodemailer')
 const USEROBJET = require('../models/User')
 const KEYS = USEROBJET.keys
 const USER = USEROBJET.USER
 
 const jwt = require("jsonwebtoken")
 const keycypher = "password123456"
+const llave = '123456'
 
 router.post('/user', async (req, res, next) => {
     var params = req.body
@@ -29,6 +32,7 @@ router.post('/user', async (req, res, next) => {
     }
     //hash de password
     params["password"] = crypto.createHash('md5').update(params.password).digest('hex')
+    // params["password"] = CryptoJS.AES.encrypt(params.password, llave).toString()
     var user = new USER(params)
     user.save().then(() => {
         res.status(200).json(params)
@@ -44,6 +48,7 @@ router.get("/consultaUser", async (req, res) => {
 
 
 router.get('/user', verifyTokenAdmin, verifyTokenUser, (req, res, next) => {
+// router.get('/user', (req, res, next) => {
     var params = req.query
     // console.log(params.email)
     var SKIP = 0;
@@ -110,9 +115,18 @@ router.delete('/user/:id', async (req, res) => {
 
 router.put('/user/:id', async (req, res) => {
     const params = req.body
+    var passwordcypher = crypto.createHash('md5')
+        .update(params.password)
+        .digest('hex')
     await USER.findByIdAndUpdate({ _id: req.params.id }, {
         username: params.username,
-        password: params.password,
+        ciUser:params.ciUser,
+        // password: params.password,
+        firstName: params.firstName,
+        lastNameP: params.lastNameP,
+        lastNameM: params.lastNameM,
+        repeatPass: params.password,
+        password: passwordcypher,
         email: params.email,
         sexo: params.sexo,
         rols: params.rols
@@ -156,14 +170,32 @@ const checkkeys = key => {
     return false
 }
 
-router.post('/login',async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
     var params = req.body;
-    const usuario=await USER.find({email:params.email})
-    // console.log(usuario[0].rols[0])
+    // console.log(params)
+    // const usuario = await USER.find({ email: params.email })
+    const usuario = await USER.find({ username: params.username })
+    // console.log(usuxario)
     var passwordcypher = crypto.createHash('md5')
         .update(params.password)
         .digest('hex')
-    USER.find({ email: params.email, password: passwordcypher, rols: params.rols })
+
+    // var passwordcypher = CryptoJS.AES.encrypt(params.password, llave).toString()
+    // var passwordcypher1 = CryptoJS.AES.encrypt(params.password, llave).toString()
+    // var passwordcypher2 = CryptoJS.AES.encrypt(params.password, llave).toString()
+    // console.log(passwordcypher1)
+    // console.log(passwordcypher2)
+
+    // // var data=CryptoJS.AES.encrypt(params.password,llave).toString()
+    // // var data2=CryptoJS.AES.decrypt(data,llave)
+    // // var data3=JSON.stringify(data2.toString(CryptoJS.enc.Utf8))
+    // // console.log(data)
+    // // console.log(data3)
+    // const ss=await USER.find({"$and":[{email:params.email},{rols:params.rols}] })
+    // console.log(ss)
+
+    // USER.find({ email: params.email, password: passwordcypher, rols: params.rols })
+    USER.find({ username: params.username, password: passwordcypher, rols: params.rols })
         .exec((err, docs) => {
             if (err) {
                 res.status(300).json({
@@ -178,7 +210,7 @@ router.post('/login',async (req, res, next) => {
                 return;
             } else {
                 jwt.sign(
-                    { email: params.email, password: passwordcypher, rols: params.rols },
+                    { username: params.username, password: passwordcypher, rols: params.rols },
                     keycypher,
                     { expiresIn: 60 * 60 * 24 },
                     (err, token) => {
@@ -198,6 +230,7 @@ router.post('/login',async (req, res, next) => {
                 )
             }
         })
+
 })
 
 async function verifyTokenAdmin(req, res, next) {
@@ -216,8 +249,10 @@ async function verifyTokenAdmin(req, res, next) {
                 message: 'token incorrecto'
             })
         }
-        var email = authData.email
-        USER.find({ email: email }).exec((err, docs) => {
+        // var email = authData.email
+        var username = authData.username
+        // USER.find({ email: email }).exec((err, docs) => {
+        USER.find({ username: username }).exec((err, docs) => {
             if (err) {
                 return res.status(401).json({
                     auth: false,
@@ -252,8 +287,9 @@ async function verifyTokenUser(req, res, next) {
                 message: 'token incorrecto'
             })
         }
-        var email = authData.email
-        USER.find({ email: email }).exec((err, docs) => {
+        // var email = authData.email
+        var username = authData.username
+        USER.find({ username: username }).exec((err, docs) => {
             if (err) {
                 return res.status(401).json({
                     auth: false,
@@ -272,5 +308,53 @@ async function verifyTokenUser(req, res, next) {
         })
     })
 }
+
+//---------------ENVIO AL CORREO ELECTRONICO---------------
+router.post('/password', async (req, res) => {
+    const params = req.body
+    // console.log(params)
+    var transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            // user:"alextufielamigo1@gmail.com",
+            user: params.emailPass,
+            pass: params.contraPass
+        }
+
+    })
+    var mailOptions = {
+        from: 'EMAP',
+        to: params.emailPass,
+        subject: "enviado desde emap",
+        text: `hola como estas ${params.namePass}`
+    }
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            res.status(500).send(error.message)
+        } else {
+            console.log("email enviado")
+            res.status(200).jsonp(req.body)
+        }
+    })
+})
+//-----------------------------------------------------
+router.post("/recuperar-password",async(req,res)=>{
+    const params=req.body
+    try {
+        const password=await USER.find({ciUser:params.ciPass,email:params.emailPass})
+        if(password.length>0){
+            const onlypass=password[0].repeatPass
+            const onlyuser=password[0].username
+            const data={password:onlypass,user:onlyuser}
+            res.status(200).json(data)
+        }else{
+            res.status(300).json({message:'no existe el usuario'})
+        }
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 module.exports = router;

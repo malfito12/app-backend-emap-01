@@ -32,9 +32,10 @@ router.post("/registerAllMarcaciones", async (req, res) => {
         //------busqueda de fechas ----------------------
         var buscarFechaIni = new Date(params.fechaini)
         var buscarFechaFin = new Date(params.fechafin)
-        var buscarFechaFinAux = moment(params.fechafin) // auxiliar para el caso de permisos y feriados que no entren al primer if por culpa de moment()
+        var buscarFechaFinAux = moment(params.fechafin).format('YYYY-MM-DD') // auxiliar para el caso de permisos y feriados que no entren al primer if por culpa de moment()
         var buscarFechaAux = moment(params.fechaini).format('YYYY-MM-DD')
 
+        //contar dias del mes
         var contDias = 0
         const contarDias = (buscarFechaIni, dias) => {
             buscarFechaIni.setDate(buscarFechaIni.getDate() + dias)
@@ -112,6 +113,7 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                 if (empleado[a].fechaini <= buscarFechaAux && empleado[a].fechafin >= buscarFechaAux) {
                     //SI ESTA DENTRO DEL PARAMETRO FECHAS DE CONTRATO
                     const getMarcacion = await ASIS.find({ "$and": [{ id_bio: empleado[a].id_bio }, { fecha: buscarFechaAux }] })
+                    // console.log(getMarcacion)
                     var nameDay = moment(buscarFechaAux).locale('es').format('dddd')
                     if (nameDay === arrayDiasTrabajo[0] || nameDay === arrayDiasTrabajo[1] || nameDay === arrayDiasTrabajo[2] || nameDay === arrayDiasTrabajo[3] || nameDay === arrayDiasTrabajo[4] || nameDay === arrayDiasTrabajo[5] || nameDay === arrayDiasTrabajo[6]) {
                         var auxPrueba = []
@@ -130,7 +132,7 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -154,7 +156,7 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaFeriado,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -179,13 +181,14 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                 buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
                             }
                             else if (buscarVacacion.length > 0) {
+                                var suma=0;
                                 var diaVacacion = nameDay
                                 var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
                                 var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
                                 if (hasta <= buscarFechaFin) {
                                     while (desde.isSameOrBefore(hasta)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaVacacion,
                                             fecha: moment(desde).format("YYYY-MM-DD"),
                                             ingreso1: '00:00:00',
@@ -209,7 +212,7 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                 } else if (hasta >= buscarFechaFinAux) {
                                     while (desde.isSameOrBefore(buscarFechaFinAux)) {
                                         auxPrueba3.push({
-                                            id_bio: params,
+                                            id_bio: empleado[a].id_bio,
                                             dia: diaVacacion,
                                             fecha: moment(desde).format('YYYY-MM-DD'),
                                             ingreso1: '00:00:00',
@@ -231,6 +234,7 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                     i = i + suma;
                                     i--
                                 }
+                                buscarFechaAux=moment(buscarFechaAux).add(suma,'day').format("YYYY-MM-DD")
                             }
                             else {
                                 //---------------PRUEBAS-----------------
@@ -868,7 +872,7 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                         i--;
                                     }
                                 }
-                                else if (buscarPermiso.length > 0) {
+                                else if (buscarVacacion.length > 0) {
                                     var diaVacacion = nameDay
                                     var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
                                     var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
@@ -1374,6 +1378,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 buscarFechaAux = moment(buscarFechaAux).add(suma, 'day').format('YYYY-MM-DD')
                             }
                             else if (buscarVacacion.length > 0) {
+                                var suma=0
                                 var diaVacacion = nameDay
                                 var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
                                 var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")
@@ -1426,6 +1431,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i = i + suma;
                                     i--
                                 }
+                                buscarFechaAux=moment(buscarFechaAux).add(suma,'day').format("YYYY-MM-DD")
                             }
                             else {
                                 //---------------PRUEBAS-----------------
@@ -1759,6 +1765,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                     i = i + suma;
                                     i--
                                 }
+                                
                             }
                             else if (buscarFeriado != 0) {
                                 var diaFeriado = nameDay
@@ -2063,7 +2070,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         i--;
                                     }
                                 }
-                                else if (buscarPermiso.length > 0) {
+                                else if (buscarVacacion.length > 0) {
                                     var diaVacacion = nameDay
                                     var desde = moment(buscarVacacion[0].fechaVacacionIni, "YYYY-MM-DD")
                                     var hasta = moment(buscarVacacion[0].fechaVacacionFin, "YYYY-MM-DD")

@@ -1,6 +1,11 @@
 var mongoose= require('../database')
 var USERSCHEMA={
     username:String,
+    ciUser:String,
+    firstName:String,
+    lastNameP:String,
+    lastNameM:String,
+    repeatPass:String,
     password:String,
     // ci:{
     //     type:String,

@@ -7,6 +7,8 @@ const VACACIONSCHEMA={
     CIEmp:String,
     tipoVacacion:String,
     nameVacaciones:String,
+    diasOtorgados:String,
+    diasGastados:String,
     fechaVacacionIni:String,
     fechaVacacionFin:String
 }
