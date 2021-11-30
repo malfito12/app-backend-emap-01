@@ -26,6 +26,8 @@ router.get('/planillaAportesPatronales',async(req,res)=>{
                         riesgoProfesion=parseFloat(planillaSueldo[i].auxLiquidoPagable)*0.0171
                     }
                     
+                    //------------BAJAS MEDICAS-----------
+                    const bajaMedica=parseFloat(planillaSueldo[i].bajaMedica)
                     //------------APORTE SOLIDARIO 3%-----------
                     const aporteSolidario=parseFloat(planillaSueldo[i].auxLiquidoPagable)*0.03
                     //---------------PRO VIVIENDA 3%------------
@@ -35,7 +37,7 @@ router.get('/planillaAportesPatronales',async(req,res)=>{
                     //-------------------PREVISION INDEMINIZ 8.33%--------
                     const previsionIndeminiz=parseFloat(planillaSueldo[i].auxLiquidoPagable)*0.0833
                     //--------------TOTAL-----------
-                    var totalSuma= riesgoProfesion+aporteSolidario+proVivienda+provisionAguinaldo+previsionIndeminiz+parseFloat(planillaSueldo[i].bajaMedica)
+                    var totalSuma= riesgoProfesion+bajaMedica+aporteSolidario+proVivienda+provisionAguinaldo+previsionIndeminiz+parseFloat(planillaSueldo[i].bajaMedica)
                     //---------------------------
                     array.push({
                         itemEmp:planillaSueldo[i].numItem,
@@ -45,7 +47,7 @@ router.get('/planillaAportesPatronales',async(req,res)=>{
                         departament:planillaSueldo[i].departamentEmp,
                         totalGanado:planillaSueldo[i].auxLiquidoPagable,
                         ssu:totalssu.toFixed(2),
-                        bajasMedicas:planillaSueldo[i].bajaMedica,
+                        bajasMedicas:bajaMedica.toFixed(2),
                         riesgoProfesion:riesgoProfesion.toFixed(2),
                         aporteSolidario:aporteSolidario.toFixed(2),
                         proVivienda:proVivienda.toFixed(2),

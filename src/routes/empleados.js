@@ -9,6 +9,9 @@ const upload = require('../utils/multer')
 const MOVIMIENTO = require('../models/reportes/MovimientoPersonal')
 const ALTASYBAJAS = require('../models/reportes/AltasBajasPersonal')
 const SERVICE = require('../models/reportes/YearsSevice')
+const PERMISO = require('../models/Permiso')
+const VACACION = require('../models/Vacaciones')
+const KARDEXASISTENCIA = require('../models/modelsPlanillas/KardexAsistencia')
 
 
 router.post('/empleado', upload.single('image'), async (req, res) => {
@@ -843,10 +846,21 @@ router.delete('/empleado/:id', async (req, res) => {
             // await CARGO.deleteOne({id_bio: empleado.id_bio})
             await EMPLE.findByIdAndDelete({ _id: params })
             await cloudinary.uploader.destroy(empleado.cloudinary_id)
+            await ALTASYBAJAS.deleteMany({id_bio:empleado.id_bio})
+            await SERVICE.deleteMany({id_bio:empleado.id_bio})
+            await MOVIMIENTO.deleteMany({id_bio:empleado.id_bio})
+            await PERMISO.deleteMany({id_bio:empleado.id_bio})
+            await VACACION.deleteMany({id_bio:empleado.id_bio})
+            await KARDEXASISTENCIA.deleteMany({id_bio:empleado.id_bio})
             res.status(200).json({ message: 'empleado eliminado' })
         } else {
-            await CARGO.deleteOne({ id_bio: empleado.id_bio })
             await EMPLE.findByIdAndDelete({ _id: params })
+            await ALTASYBAJAS.deleteMany({id_bio:empleado.id_bio})
+            await SERVICE.deleteMany({id_bio:empleado.id_bio})
+            await MOVIMIENTO.deleteMany({id_bio:empleado.id_bio})
+            await PERMISO.deleteMany({id_bio:empleado.id_bio})
+            await VACACION.deleteMany({id_bio:empleado.id_bio})
+            await KARDEXASISTENCIA.deleteMany({id_bio:empleado.id_bio})
             res.status(200).json({ message: 'empleado eliminado' })
         }
     } catch (error) {

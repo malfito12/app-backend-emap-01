@@ -47,8 +47,8 @@ router.get("/consultaUser", async (req, res) => {
 })
 
 
-router.get('/user', verifyTokenAdmin, verifyTokenUser, (req, res, next) => {
-// router.get('/user', (req, res, next) => {
+// router.get('/user', verifyTokenAdmin, verifyTokenUser, (req, res, next) => {
+router.get('/user', (req, res, next) => {
     var params = req.query
     // console.log(params.email)
     var SKIP = 0;
@@ -109,8 +109,14 @@ router.get('/user', verifyTokenAdmin, verifyTokenUser, (req, res, next) => {
 // })
 
 router.delete('/user/:id', async (req, res) => {
-    const usuarios = await USER.findByIdAndDelete(req.params.id)
-    res.status(200).json({ message: 'usuario eliminado' })
+    const usuario = await USER.findById({_id:req.params.id})
+    // console.log(usuario.rols[0])
+    if(usuario.rols[0]==='usuario'){
+        await USER.findByIdAndDelete(req.params.id)
+        res.status(200).json({ message: 'usuario eliminado' })
+    }else if(usuario.rols[0]==='admin'){
+        res.status(300).json({message:'no se puede borrar a un administrador'})
+    }
 })
 
 router.put('/user/:id', async (req, res) => {
