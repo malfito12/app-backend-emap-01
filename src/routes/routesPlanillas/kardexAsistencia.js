@@ -395,7 +395,16 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                 }
                                 else if (numAux == 2) {
                                     const { duration, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1])
-
+                                    //CONTROL DE VERICAR MARCACION
+                                    var data1 = moment(`1990-01-01 ${auxPrueba2[0]}`)
+                                    var data2 = moment(`1990-01-02 ${auxPrueba2[1]}`)
+                                    var diferencia = moment.duration(data2.diff(data1)).asHours()
+                                    var verificar;
+                                    if(diferencia>7){
+                                        verificar=''
+                                    }else{
+                                        verificar='verificar marcación'
+                                    }
                                     auxPrueba3.push({
                                         id_bio: empleado[a].id_bio,
                                         fecha: buscarFechaAux,
@@ -409,7 +418,8 @@ router.post("/registerAllMarcaciones", async (req, res) => {
                                         horasDeTrabajo: duration.toFixed(2),
                                         diaTrabajado: '1.0',
                                         faltas: result.toFixed(2),
-                                        observaciones: 'verificar marcación',
+                                        // observaciones: 'verificar marcación',
+                                        observaciones: verificar,
                                         observaciones2: "",
                                     })
                                 }
@@ -1592,7 +1602,15 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                 }
                                 else if (numAux == 2) {
                                     const { duration, result } = horasTrabajo(auxPrueba2[0], auxPrueba2[1])
-
+                                    var data1 = moment(`1990-01-01 ${auxPrueba2[0]}`)
+                                    var data2 = moment(`1990-01-02 ${auxPrueba2[1]}`)
+                                    var diferencia = moment.duration(data2.diff(data1)).asHours()
+                                    var verificar;
+                                    if(diferencia>7){
+                                        verificar=''
+                                    }else{
+                                        verificar='verificar marcación'
+                                    }
                                     auxPrueba3.push({
                                         id_bio: params,
                                         fecha: buscarFechaAux,
@@ -1606,7 +1624,7 @@ router.get("/nuevoTodo/:id", async (req, res) => {
                                         horasDeTrabajo: duration.toFixed(2),
                                         diaTrabajado: '1.0',
                                         faltas: result.toFixed(2),
-                                        observaciones: 'verificar marcación',
+                                        observaciones: verificar,
                                         observaciones2: "",
                                     })
                                 }
