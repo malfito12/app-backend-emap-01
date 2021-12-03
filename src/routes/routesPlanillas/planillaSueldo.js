@@ -19,9 +19,67 @@ const CONFIG = require('../../models/GeneralConfig')
 
 router.get('/pre-planillasueldo', async (req, res) => {
     // const params = req.params.id
-    const diaini = req.query.fechaini
-    const diafin = req.query.fechafin
+    // const diaini = req.query.fechaini
+    // const diafin = req.query.fechafin
+    const mes = req.query.mes
+    const year = req.query.year
     const planilla = req.query.typePlanilla
+
+    var diaini;
+    var diafin;
+
+    switch (mes) {
+        case "ENERO":
+            diaini = moment(`${year}-01-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-02-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "FEBRERO":
+            diaini = moment(`${year}-02-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-03-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "MARZO":
+            diaini = moment(`${year}-03-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-04-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "ABRIL":
+            diaini = moment(`${year}-04-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-05-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "MAYO":
+            diaini = moment(`${year}-05-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-06-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "JUNIO":
+            diaini = moment(`${year}-06-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-07-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "JULIO":
+            diaini = moment(`${year}-07-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-08-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "AGOSTO":
+            diaini = moment(`${year}-08-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-09-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "SEPTIEMBRE":
+            diaini = moment(`${year}-09-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-10-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "OCTUBRE":
+            diaini = moment(`${year}-10-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-11-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "NOVIEMBRE":
+            diaini = moment(`${year}-11-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-12-01`).subtract(1, 'day').format("YYYY-MM-DD")
+            break;
+        case "DICIEMBRE":
+            diaini = moment(`${year}-12-01`).format("YYYY-MM-DD")
+            diafin = moment(`${year}-12-31`).format("YYYY-MM-DD")
+            break;
+        default:
+            console.log('no existe el mes')
+    }
     // var aux=moment(diaini).add(1,'day').format("YYYY-MM-DD")
     // console.log(aux)
     // console.log(diaini)
@@ -262,19 +320,19 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
                         CIEmp: empleado[i].CIEmp,
                         nameEmp: fullname,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         nacionality: empleado[i].nacionalityEmp,
                         sexoEmp: empleado[i].sexoEmp,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -515,8 +573,8 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
@@ -525,9 +583,9 @@ router.get('/pre-planillasueldo', async (req, res) => {
                         nameEmp: fullname,
                         nacionality: empleado[i].nacionalityEmp,
                         sexoEmp: empleado[i].sexoEmp,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -765,8 +823,8 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
@@ -774,10 +832,10 @@ router.get('/pre-planillasueldo', async (req, res) => {
                         CIEmp: empleado[i].CIEmp,
                         nameEmp: fullname,
                         nacionality: empleado[i].nacionalityEmp,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         sexoEmp: empleado[i].sexoEmp,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -1013,19 +1071,19 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA + descuentoSindicato
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
                         CIEmp: empleado[i].CIEmp,
                         nameEmp: fullname,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         nacionality: empleado[i].nacionalityEmp,
                         sexoEmp: empleado[i].sexoEmp,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -1265,19 +1323,19 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
                         CIEmp: empleado[i].CIEmp,
                         nameEmp: fullname,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         nacionality: empleado[i].nacionalityEmp,
                         sexoEmp: empleado[i].sexoEmp,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -1497,19 +1555,19 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
                         CIEmp: empleado[i].CIEmp,
                         nameEmp: fullname,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         nacionality: empleado[i].nacionalityEmp,
                         sexoEmp: empleado[i].sexoEmp,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -1725,19 +1783,19 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
                         CIEmp: empleado[i].CIEmp,
                         nameEmp: fullname,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         nacionality: empleado[i].nacionalityEmp,
                         sexoEmp: empleado[i].sexoEmp,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -1952,19 +2010,19 @@ router.get('/pre-planillasueldo', async (req, res) => {
                     const totalDesc = sancionTotal + descuentoAFP + descuentoRCIVA
                     //---------------LIQUIDO PAGABLE--------------------------
                     var totalLiquido = totalIngreso - totalDesc
-                    if(totalLiquido<0){
-                        totalLiquido=0
+                    if (totalLiquido < 0) {
+                        totalLiquido = 0
                     }
                     //------------------------------------------
                     array.push({
                         numItem: empleado[i].itemEmp,
                         CIEmp: empleado[i].CIEmp,
                         nameEmp: fullname,
-                        cotizante:empleado[i].cotizante,
+                        cotizante: empleado[i].cotizante,
                         nacionality: empleado[i].nacionalityEmp,
                         sexoEmp: empleado[i].sexoEmp,
                         cargoEmp: empleado[i].cargoEmp,
-                        departamentEmp:empleado[i].departamentEmp,
+                        departamentEmp: empleado[i].departamentEmp,
                         fechaIng: empleado[i].fechaini,
                         haber_basico: empleado[i].haber_basico,
                         diasTrabajados: sum,
@@ -2036,12 +2094,69 @@ router.post("/planillaSueldo", async (req, res) => {
 
 //----------------------GET PLANILLA SUELDOS---------------------------
 router.get("/planillaSueldo", async (req, res) => {
-    const fechaIni = req.query.fechaini
-    const fechaFin = req.query.fechafin
+    // const fechaIni = req.query.fechaini
+    // const fechaFin = req.query.fechafin
     const typePlan = req.query.typePlanilla
     // console.log(fechaIni)
     // console.log(fechaFin)
     // console.log(typePlan)
+    const mes = req.query.mes
+    const year = req.query.year
+    var fechaIni;
+    var fechaFin;
+    switch(mes){
+        case "ENERO":
+            fechaIni=moment(`${year}-01-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-02-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "FEBRERO":
+            fechaIni=moment(`${year}-02-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-03-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "MARZO":
+            fechaIni=moment(`${year}-03-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-04-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "ABRIL":
+            fechaIni=moment(`${year}-04-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-05-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "MAYO":
+            fechaIni=moment(`${year}-05-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-06-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "JUNIO":
+            fechaIni=moment(`${year}-06-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-07-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "JULIO":
+            fechaIni=moment(`${year}-07-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-08-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "AGOSTO":
+            fechaIni=moment(`${year}-08-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-09-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "SEPTIEMBRE":
+            fechaIni=moment(`${year}-09-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-10-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "OCTUBRE":
+            fechaIni=moment(`${year}-10-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-11-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "NOVIEMBRE":
+            fechaIni=moment(`${year}-11-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-12-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "DICIEMBRE":
+            fechaIni=moment(`${year}-12-01`).format("YYYY-MM-DD")
+            fechaFin=moment(`${year}-12-31`).format("YYYY-MM-DD")
+            break;
+        default:
+            console.log('no existe el mes')
+    }
+
     try {
         const planillasSueldo = await PLANILLASUELDO.find({ "$and": [{ buscarFechaInicio: fechaIni }, { buscarFechaFinal: fechaFin }, { typePlanilla: typePlan }] })
         // console.log(planillasSueldo)
@@ -2059,7 +2174,7 @@ router.put("/planillaSueldo/:id", async (req, res) => {
     //-----INTERINATO-------------
     const totalGanado = parseFloat(params.interinato) + parseFloat(params.totalGanado)
     //-----------BAJA MEDICA S.S.U.-----------
-    const reBajaMedica=parseFloat(params.bajaMedica)
+    const reBajaMedica = parseFloat(params.bajaMedica)
     //-------------------------
     const totalFinal = totalGanado - parseFloat(params.totalDescuento)
     //-------------------------
@@ -2070,7 +2185,7 @@ router.put("/planillaSueldo/:id", async (req, res) => {
         nacionality: params.nacionality,
         sexoEmp: params.sexoEmp,
         cargoEmp: params.cargoEmp,
-        departamentEmp:params.departamentEmp,
+        departamentEmp: params.departamentEmp,
         fechaIng: params.fechaIng,
         haber_basico: params.haber_basico,
         diasTrabajados: params.diasTrabajados,

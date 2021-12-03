@@ -91,9 +91,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }
@@ -209,9 +210,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }
@@ -327,9 +329,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }
@@ -444,9 +447,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }
@@ -574,9 +578,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }
@@ -691,9 +696,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }
@@ -809,9 +815,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }
@@ -926,9 +933,10 @@ router.get("/pre-planillarefrigerio", async (req, res) => {
                                     // console.log(buscarFechaAux)
                                     console.log('no existe el kaxdex de asistencia de la fecha')
                                 }
-                            } else {
-                                sumDias = sumDias + 1
-                            }
+                            } 
+                            // else {
+                            //     sumDias = sumDias + 1
+                            // }
                         } else {
                             console.log("el dia es feriado")
                         }

@@ -2434,17 +2434,77 @@ router.post('/subirinfo', async (req, res) => {
 //----------------GET KARDEX ASISTENCIA-----------------------------
 router.get("/kardexAsistencia/:id", async (req, res) => {
     const params = req.params.id
-    const fechaini = req.query.fechaini
-    const fechafin = req.query.fechafin
+    // const fechaini = req.query.fechaini
+    // const fechafin = req.query.fechafin
 
+    const mes = req.query.mes
+    const year = req.query.year
+    var fecha1;
+    var fecha2;
     const empleado = await EMPLEADO.find({ id_bio: params })
+
+    switch(mes){
+        case "ENERO":
+            fecha1=moment(`${year}-01-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-02-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "FEBRERO":
+            fecha1=moment(`${year}-02-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-03-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "MARZO":
+            fecha1=moment(`${year}-03-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-04-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "ABRIL":
+            fecha1=moment(`${year}-04-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-05-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "MAYO":
+            fecha1=moment(`${year}-05-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-06-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "JUNIO":
+            fecha1=moment(`${year}-06-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-07-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "JULIO":
+            fecha1=moment(`${year}-07-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-08-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "AGOSTO":
+            fecha1=moment(`${year}-08-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-09-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "SEPTIEMBRE":
+            fecha1=moment(`${year}-09-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-10-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "OCTUBRE":
+            fecha1=moment(`${year}-10-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-11-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "NOVIEMBRE":
+            fecha1=moment(`${year}-11-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-12-01`).subtract(1,'day').format("YYYY-MM-DD")
+            break;
+        case "DICIEMBRE":
+            fecha1=moment(`${year}-12-01`).format("YYYY-MM-DD")
+            fecha2=moment(`${year}-12-31`).format("YYYY-MM-DD")
+            break;
+        default:
+            console.log('no existe el mes')
+    }
+
+    // console.log(fecha1)
+    // console.log(fecha2)
     var array = []
     try {
         if (empleado.length > 0) {
             //-------------busqueda de marcaciones por fechaini y fechafin-----------
-            var buscarFechaIni = new Date(fechaini)
-            var buscarFechaFin = new Date(fechafin)
-            var buscarFechaAux = moment(fechaini).format("YYYY-MM-DD")
+            var buscarFechaIni = new Date(fecha1)
+            var buscarFechaFin = new Date(fecha2)
+            var buscarFechaAux = moment(fecha1).format("YYYY-MM-DD")
             var contDias = 0
             const contarDias = (buscarFechaIni, dias) => {
                 buscarFechaIni.setDate(buscarFechaIni.getDate() + dias)

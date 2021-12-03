@@ -1,11 +1,12 @@
 const mongoose=require('../database')
 const EMPLEADOSCHEMA={
-    id_bio:{
-        type:String,
-        require:true,
-        trim:true,
-        unique:true
-    },
+    // id_bio:{
+    //     type:String,
+    //     require:true,
+    //     trim:true,
+    //     unique:true
+    // },
+    id_bio:String,
     itemEmp:String,
     lastNameEmpP:String,
     lastNameEmpM:String,

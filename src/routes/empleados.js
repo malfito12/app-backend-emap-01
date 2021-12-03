@@ -3,7 +3,7 @@ const router = express.Router()
 const EMPLE = require('../models/Empleado')
 const CARGO = require('../models/Cargo')
 const HORARIO = require('../models/Horario')
-const moment=require('moment')
+const moment = require('moment')
 const cloudinary = require('../utils/cloudinary')
 const upload = require('../utils/multer')
 const MOVIMIENTO = require('../models/reportes/MovimientoPersonal')
@@ -18,180 +18,185 @@ router.post('/empleado', upload.single('image'), async (req, res) => {
     const params = req.body
     const horario = await HORARIO.find()
     const aux = horario.length
-    try {
-        var numero = 1;
-        if (params.typeContrato === 'eventual') {
-            // console.log('entra')
-            numero = 0
-            numero = numero.toString()
-        } else {
-            while (true) {
+    const existe = await EMPLE.find({ id_bio: params.id_bio })
+    if (existe.length ===0) {
+        try {
+            var numero = 1;
+            if (params.typeContrato === 'eventual') {
+                // console.log('entra')
+                numero = 0
                 numero = numero.toString()
-                const numItem = await EMPLE.find({ "$and": [{ estadoEmp: 'activo' }, { typeContrato: 'permanente' }, { itemEmp: numero }] })
-                if (numItem.length > 0) {
-                    numero = parseInt(numero)
-                    numero++;
+            } else {
+                while (true) {
+                    numero = numero.toString()
+                    const numItem = await EMPLE.find({ "$and": [{ estadoEmp: 'activo' }, { typeContrato: 'permanente' }, { itemEmp: numero }] })
+                    if (numItem.length > 0) {
+                        numero = parseInt(numero)
+                        numero++;
+                    }
+                    else break;
                 }
-                else break;
             }
-        }
 
-        for (var i = 0; i < aux; i++) {
-            if (params.typeHorario === horario[i].descripcion) {
-                if (req.file) {
-                    //---SI EXISTE IMAGEN---
-                    const result = await cloudinary.uploader.upload(req.file.path)
-                    const empleado = new EMPLE({
-                        id_bio: params.id_bio,
-                        // itemEmp: params.itemEmp,
-                        itemEmp: numero,
-                        lastNameEmpP: params.lastNameEmpP,
-                        lastNameEmpM: params.lastNameEmpM,
-                        firstNameEmp: params.firstNameEmp,
-                        nacionalityEmp: params.nacionalityEmp,
-                        CIEmp: params.CIEmp,
-                        fechaNacEmp: params.fechaNacEmp,
-                        sexoEmp: params.sexoEmp,
-                        //-------------
-                        cargoEmp: params.cargoEmp,
-                        haber_basico: params.haber_basico,
-                        //-------------------------
-                        departamentEmp: params.departamentEmp,
-                        typeContrato: params.typeContrato,
-                        clasificacionLab: params.clasificacionLab,
-                        typeHorario: params.typeHorario,
-                        typeAntiguedad: params.typeAntiguedad,
-                        AFP: params.AFP,
-                        cotizante: params.cotizante,
-                        //-------------
-                        dirEmp: params.dirEmp,
-                        numCelEmp: params.numCelEmp,
-                        civilStatusEmp: params.civilStatusEmp,
-                        //-------------
-                        afilSindicato: params.afilSindicato,
-                        lugarNacimiento: params.lugarNacimiento,
-                        //-------------
-                        emailEmp: params.emailEmp,
-                        professionEmp: params.professionEmp,
-                        institutionDegreeEmp: params.institutionDegreeEmp,
-                        estadoEmp: params.estadoEmp,
-                        ObserEmp: params.ObserEmp,
-                        // fechaIni: params.fechaini,
-                        // fechafin: params.fechafin,
+            for (var i = 0; i < aux; i++) {
+                if (params.typeHorario === horario[i].descripcion) {
+                    if (req.file) {
+                        //---SI EXISTE IMAGEN---
+                        const result = await cloudinary.uploader.upload(req.file.path)
+                        const empleado = new EMPLE({
+                            id_bio: params.id_bio,
+                            // itemEmp: params.itemEmp,
+                            itemEmp: numero,
+                            lastNameEmpP: params.lastNameEmpP,
+                            lastNameEmpM: params.lastNameEmpM,
+                            firstNameEmp: params.firstNameEmp,
+                            nacionalityEmp: params.nacionalityEmp,
+                            CIEmp: params.CIEmp,
+                            fechaNacEmp: params.fechaNacEmp,
+                            sexoEmp: params.sexoEmp,
+                            //-------------
+                            cargoEmp: params.cargoEmp,
+                            haber_basico: params.haber_basico,
+                            //-------------------------
+                            departamentEmp: params.departamentEmp,
+                            typeContrato: params.typeContrato,
+                            clasificacionLab: params.clasificacionLab,
+                            typeHorario: params.typeHorario,
+                            typeAntiguedad: params.typeAntiguedad,
+                            AFP: params.AFP,
+                            cotizante: params.cotizante,
+                            //-------------
+                            dirEmp: params.dirEmp,
+                            numCelEmp: params.numCelEmp,
+                            civilStatusEmp: params.civilStatusEmp,
+                            //-------------
+                            afilSindicato: params.afilSindicato,
+                            lugarNacimiento: params.lugarNacimiento,
+                            //-------------
+                            emailEmp: params.emailEmp,
+                            professionEmp: params.professionEmp,
+                            institutionDegreeEmp: params.institutionDegreeEmp,
+                            estadoEmp: params.estadoEmp,
+                            ObserEmp: params.ObserEmp,
+                            // fechaIni: params.fechaini,
+                            // fechafin: params.fechafin,
 
-                        tolerancia: horario[i].tolerancia,
-                        cod_estH: horario[i].tipoHorario,
-                        ingreso1: horario[i].ingreso1,
-                        salida1: horario[i].salida1,
-                        ingreso2: horario[i].ingreso2,
-                        salida2: horario[i].salida2,
-                        cod_horario: horario[i].cod,
-                        fechaini: params.fechaini,
-                        fechafin: params.fechafin,
+                            tolerancia: horario[i].tolerancia,
+                            cod_estH: horario[i].tipoHorario,
+                            ingreso1: horario[i].ingreso1,
+                            salida1: horario[i].salida1,
+                            ingreso2: horario[i].ingreso2,
+                            salida2: horario[i].salida2,
+                            cod_horario: horario[i].cod,
+                            fechaini: params.fechaini,
+                            fechafin: params.fechafin,
 
-                        // photoImgEmp:params.photoImgEmp,
-                        // fechaini: params.fechaini,
-                        // fechaReg: params.fechaReg,
-                        // fechaBaja: params.fechaBaja,
-                        avatar: result.secure_url,
-                        cloudinary_id: result.public_id,
-                    })
-                    params['fechaReg'] = new Date()
-                    // params['fechaini'] = new Date()
-                    await empleado.save().then(() => {
-                        res.status(200).json({ message: 'empleado registrado' })
-                    })
-                    //REGISTRO DE ALTAS Y BAJAS
-                    var fecha = new Date()
-                    const altaybaja = new ALTASYBAJAS({
-                        id_bio: params.id_bio,
-                        fullName: params.firstNameEmp +" "+ params.lastNameEmpP+""+params.lastNameEmpM,
-                        // firstNameEmp: params.firstNameEmp,
-                        // lastNameEmpP: params.lastNameEmpP,
-                        // lastNameEmpM: params.lastNameEmpM,
-                        estadoEmp: params.estadoEmp,
-                        fechaAltasBajas: fecha.toLocaleDateString(),
-                    })
-                    altaybaja.save()
-                    //REGISTRO AÑOS DE SERVICIO
-                    const servicio = new SERVICE(params)
-                    servicio.save()
+                            // photoImgEmp:params.photoImgEmp,
+                            // fechaini: params.fechaini,
+                            // fechaReg: params.fechaReg,
+                            // fechaBaja: params.fechaBaja,
+                            avatar: result.secure_url,
+                            cloudinary_id: result.public_id,
+                        })
+                        params['fechaReg'] = new Date()
+                        // params['fechaini'] = new Date()
+                        await empleado.save().then(() => {
+                            res.status(200).json({ message: 'empleado registrado' })
+                        })
+                        //REGISTRO DE ALTAS Y BAJAS
+                        var fecha = new Date()
+                        const altaybaja = new ALTASYBAJAS({
+                            id_bio: params.id_bio,
+                            fullName: params.firstNameEmp + " " + params.lastNameEmpP + "" + params.lastNameEmpM,
+                            // firstNameEmp: params.firstNameEmp,
+                            // lastNameEmpP: params.lastNameEmpP,
+                            // lastNameEmpM: params.lastNameEmpM,
+                            estadoEmp: params.estadoEmp,
+                            fechaAltasBajas: fecha.toLocaleDateString(),
+                        })
+                        altaybaja.save()
+                        //REGISTRO AÑOS DE SERVICIO
+                        const servicio = new SERVICE(params)
+                        servicio.save()
 
-                } else {
-                    //----NO EXISTE IMAGEN----
-                    const empleado = new EMPLE({
-                        id_bio: params.id_bio,
-                        // itemEmp: params.itemEmp,
-                        itemEmp: numero,
-                        lastNameEmpP: params.lastNameEmpP,
-                        lastNameEmpM: params.lastNameEmpM,
-                        firstNameEmp: params.firstNameEmp,
-                        nacionalityEmp: params.nacionalityEmp,
-                        CIEmp: params.CIEmp,
-                        fechaNacEmp: params.fechaNacEmp,
-                        sexoEmp: params.sexoEmp,
-                        //-------------
-                        haber_basico: params.haber_basico,
-                        //-------------
-                        cargoEmp: params.cargoEmp,
-                        departamentEmp: params.departamentEmp,
-                        typeContrato: params.typeContrato,
-                        clasificacionLab: params.clasificacionLab,
-                        typeHorario: params.typeHorario,
-                        typeAntiguedad: params.TypeAntiguedad,
-                        AFP: params.AFP,
-                        cotizante: params.cotizante,
-                        //-------------
-                        dirEmp: params.dirEmp,
-                        numCelEmp: params.numCelEmp,
-                        civilStatusEmp: params.civilStatusEmp,
-                        //-------------
-                        afilSindicato: params.afilSindicato,
-                        lugarNacimiento: params.lugarNacimiento,
-                        //-------------
-                        emailEmp: params.emailEmp,
-                        professionEmp: params.professionEmp,
-                        institutionDegreeEmp: params.institutionDegreeEmp,
-                        estadoEmp: params.estadoEmp,
-                        ObserEmp: params.ObserEmp,
-                        // fechaIni: params.fechaini,
-                        // fechafin: params.fechafin,
-                        tolerancia: horario[i].tolerancia,
-                        cod_estH: horario[i].tipoHorario,
-                        ingreso1: horario[i].ingreso1,
-                        salida1: horario[i].salida1,
-                        ingreso2: horario[i].ingreso2,
-                        salida2: horario[i].salida2,
-                        cod_horario: horario[i].cod,
-                        fechaini: params.fechaini,
-                        fechafin: params.fechafin,
-                    })
-                    params['fechaReg'] = new Date()
-                    // params['fechaini'] = new Date()
-                    await empleado.save().then(() => {
-                        res.status(200).json({ message: 'empleado registrado' })
-                    })
-                    var fecha = new Date()
-                    const altaybaja = new ALTASYBAJAS({
-                        id_bio: params.id_bio,
-                        fullName: params.firstNameEmp +" "+ params.lastNameEmpP+""+params.lastNameEmpM,
-                        // firstNameEmp: params.firstNameEmp,
-                        // lastNameEmpP: params.lastNameEmpP,
-                        // lastNameEmpM: params.lastNameEmpM,
-                        estadoEmp: params.estadoEmp,
-                        fechaAltasBajas: fecha.toLocaleDateString(),
-                    })
-                    altaybaja.save()
-                    //REGISTRO AÑOS DE SERVICIO
-                    const servicio = new SERVICE(params)
-                    servicio.save()
+                    } else {
+                        //----NO EXISTE IMAGEN----
+                        const empleado = new EMPLE({
+                            id_bio: params.id_bio,
+                            // itemEmp: params.itemEmp,
+                            itemEmp: numero,
+                            lastNameEmpP: params.lastNameEmpP,
+                            lastNameEmpM: params.lastNameEmpM,
+                            firstNameEmp: params.firstNameEmp,
+                            nacionalityEmp: params.nacionalityEmp,
+                            CIEmp: params.CIEmp,
+                            fechaNacEmp: params.fechaNacEmp,
+                            sexoEmp: params.sexoEmp,
+                            //-------------
+                            haber_basico: params.haber_basico,
+                            //-------------
+                            cargoEmp: params.cargoEmp,
+                            departamentEmp: params.departamentEmp,
+                            typeContrato: params.typeContrato,
+                            clasificacionLab: params.clasificacionLab,
+                            typeHorario: params.typeHorario,
+                            typeAntiguedad: params.TypeAntiguedad,
+                            AFP: params.AFP,
+                            cotizante: params.cotizante,
+                            //-------------
+                            dirEmp: params.dirEmp,
+                            numCelEmp: params.numCelEmp,
+                            civilStatusEmp: params.civilStatusEmp,
+                            //-------------
+                            afilSindicato: params.afilSindicato,
+                            lugarNacimiento: params.lugarNacimiento,
+                            //-------------
+                            emailEmp: params.emailEmp,
+                            professionEmp: params.professionEmp,
+                            institutionDegreeEmp: params.institutionDegreeEmp,
+                            estadoEmp: params.estadoEmp,
+                            ObserEmp: params.ObserEmp,
+                            // fechaIni: params.fechaini,
+                            // fechafin: params.fechafin,
+                            tolerancia: horario[i].tolerancia,
+                            cod_estH: horario[i].tipoHorario,
+                            ingreso1: horario[i].ingreso1,
+                            salida1: horario[i].salida1,
+                            ingreso2: horario[i].ingreso2,
+                            salida2: horario[i].salida2,
+                            cod_horario: horario[i].cod,
+                            fechaini: params.fechaini,
+                            fechafin: params.fechafin,
+                        })
+                        params['fechaReg'] = new Date()
+                        // params['fechaini'] = new Date()
+                        await empleado.save().then(() => {
+                            res.status(200).json({ message: 'empleado registrado' })
+                        })
+                        var fecha = new Date()
+                        const altaybaja = new ALTASYBAJAS({
+                            id_bio: params.id_bio,
+                            fullName: params.firstNameEmp + " " + params.lastNameEmpP + "" + params.lastNameEmpM,
+                            // firstNameEmp: params.firstNameEmp,
+                            // lastNameEmpP: params.lastNameEmpP,
+                            // lastNameEmpM: params.lastNameEmpM,
+                            estadoEmp: params.estadoEmp,
+                            fechaAltasBajas: fecha.toLocaleDateString(),
+                        })
+                        altaybaja.save()
+                        //REGISTRO AÑOS DE SERVICIO
+                        const servicio = new SERVICE(params)
+                        servicio.save()
+                    }
+                    break;
                 }
-                break;
             }
-        }
 
-    } catch (error) {
-        console.log(error)
+        } catch (error) {
+            console.log(error)
+        }
+    } else {
+        res.status(400).json({message:'ya existe el empleado'})
     }
     // console.log(params)
 
@@ -272,8 +277,8 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
         }
         //ANTIGUDAD---------
         if (params.typeAntiguedad != empleado_bio[0].typeAntiguedad) {
-            var fechaCambio=new Date()
-            fechaCambio=moment(fechaCambio).format("YYYY-MM-DD")
+            var fechaCambio = new Date()
+            fechaCambio = moment(fechaCambio).format("YYYY-MM-DD")
             const service = new SERVICE({
                 id_bio: params.id_bio,
                 firstNameEmp: params.firstNameEmp,
@@ -823,12 +828,12 @@ router.put('/empleado/:id', upload.single('image'), async (req, res) => {
             var fecha = new Date()
             const altaybaja = new ALTASYBAJAS({
                 id_bio: params.id_bio,
-                fullName: params.firstNameEmp +" "+ params.lastNameEmpP+""+params.lastNameEmpM,
+                fullName: params.firstNameEmp + " " + params.lastNameEmpP + "" + params.lastNameEmpM,
                 // firstNameEmp: params.firstNameEmp,
                 // lastNameEmpP: params.lastNameEmpP,
                 // lastNameEmpM: params.lastNameEmpM,
                 estadoEmp: params.estadoEmp,
-                motivoCambio:params.motivoCambio,
+                motivoCambio: params.motivoCambio,
                 fechaAltasBajas: fecha.toLocaleDateString(),
             })
             altaybaja.save()
@@ -846,21 +851,21 @@ router.delete('/empleado/:id', async (req, res) => {
             // await CARGO.deleteOne({id_bio: empleado.id_bio})
             await EMPLE.findByIdAndDelete({ _id: params })
             await cloudinary.uploader.destroy(empleado.cloudinary_id)
-            await ALTASYBAJAS.deleteMany({id_bio:empleado.id_bio})
-            await SERVICE.deleteMany({id_bio:empleado.id_bio})
-            await MOVIMIENTO.deleteMany({id_bio:empleado.id_bio})
-            await PERMISO.deleteMany({id_bio:empleado.id_bio})
-            await VACACION.deleteMany({id_bio:empleado.id_bio})
-            await KARDEXASISTENCIA.deleteMany({id_bio:empleado.id_bio})
+            await ALTASYBAJAS.deleteMany({ id_bio: empleado.id_bio })
+            await SERVICE.deleteMany({ id_bio: empleado.id_bio })
+            await MOVIMIENTO.deleteMany({ id_bio: empleado.id_bio })
+            await PERMISO.deleteMany({ id_bio: empleado.id_bio })
+            await VACACION.deleteMany({ id_bio: empleado.id_bio })
+            await KARDEXASISTENCIA.deleteMany({ id_bio: empleado.id_bio })
             res.status(200).json({ message: 'empleado eliminado' })
         } else {
             await EMPLE.findByIdAndDelete({ _id: params })
-            await ALTASYBAJAS.deleteMany({id_bio:empleado.id_bio})
-            await SERVICE.deleteMany({id_bio:empleado.id_bio})
-            await MOVIMIENTO.deleteMany({id_bio:empleado.id_bio})
-            await PERMISO.deleteMany({id_bio:empleado.id_bio})
-            await VACACION.deleteMany({id_bio:empleado.id_bio})
-            await KARDEXASISTENCIA.deleteMany({id_bio:empleado.id_bio})
+            await ALTASYBAJAS.deleteMany({ id_bio: empleado.id_bio })
+            await SERVICE.deleteMany({ id_bio: empleado.id_bio })
+            await MOVIMIENTO.deleteMany({ id_bio: empleado.id_bio })
+            await PERMISO.deleteMany({ id_bio: empleado.id_bio })
+            await VACACION.deleteMany({ id_bio: empleado.id_bio })
+            await KARDEXASISTENCIA.deleteMany({ id_bio: empleado.id_bio })
             res.status(200).json({ message: 'empleado eliminado' })
         }
     } catch (error) {
