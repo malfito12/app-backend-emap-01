@@ -181,27 +181,13 @@ router.post('/login', async (req, res, next) => {
     // console.log(params)
     // const usuario = await USER.find({ email: params.email })
     const usuario = await USER.find({ username: params.username })
-    // console.log(usuxario)
+    // console.log(usuario)
     var passwordcypher = crypto.createHash('md5')
         .update(params.password)
         .digest('hex')
 
-    // var passwordcypher = CryptoJS.AES.encrypt(params.password, llave).toString()
-    // var passwordcypher1 = CryptoJS.AES.encrypt(params.password, llave).toString()
-    // var passwordcypher2 = CryptoJS.AES.encrypt(params.password, llave).toString()
-    // console.log(passwordcypher1)
-    // console.log(passwordcypher2)
-
-    // // var data=CryptoJS.AES.encrypt(params.password,llave).toString()
-    // // var data2=CryptoJS.AES.decrypt(data,llave)
-    // // var data3=JSON.stringify(data2.toString(CryptoJS.enc.Utf8))
-    // // console.log(data)
-    // // console.log(data3)
-    // const ss=await USER.find({"$and":[{email:params.email},{rols:params.rols}] })
-    // console.log(ss)
-
-    // USER.find({ email: params.email, password: passwordcypher, rols: params.rols })
-    USER.find({ username: params.username, password: passwordcypher, rols: params.rols })
+    // USER.find({ username: params.username, password: passwordcypher, rols: params.rols })
+    USER.find({ username: params.username, password: passwordcypher })
         .exec((err, docs) => {
             if (err) {
                 res.status(300).json({
